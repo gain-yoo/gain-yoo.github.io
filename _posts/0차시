@@ -1,0 +1,817 @@
+# 0차시_바닐라 쿠버네티스 실습 환경 배포_작성중
+
+Date: May 22, 2022
+Tags: AWS, Kubernetes
+
+# 사전준비
+## 전체 구성도
+
+![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled.png)
+
+- CloudFormation 스택 실행 시 파라미터를 기입하면, 해당 정보가 반영되어 배포됩니다.
+- CloudFormation 에 EC2의 **UserData** 부분(**Script** 실행)으로 **바닐라** [vanilla](https://librewiki.net/wiki/%EB%B0%94%EB%8B%90%EB%9D%BC_(%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4)) **쿠버네티스** 설치를 진행합니다 (AWS EKS 등 관리형 미사용)
+    - **쿠버네티스** 버전 v1.23.6 , Calico **CNI**(CrossSubnet 모드, ENI S/D Uncheck) , **CRI**(Docker), **StorageClass**(local-path, hostpath)
+- 사용자 네트워크 대역은 퍼블릭 서브넷 2개와 프라이빗 서브넷 2개로 구성됩니다
+- **마스터** 노드 **1**대, **워커** 노드는 기본은 **3**대로 구성됩니다
+    - `EC2 Spec` : Ubuntu 22.04 , t3.medium (2CPU 4MEM, 0.052 USD x 4대 = 0.208USD = 1시간 당 **266**원) - [가격](https://aws.amazon.com/ko/ec2/pricing/on-demand/), EBS gp3 40GiB
+    
+    | Hostname | IPv4 |
+    | --- | --- |
+    | k8s-m | 192.168.10.10 |
+    | k8s-w1 | 192.168.10.101 |
+    | k8s-w2 | 192.168.10.102 |
+    | k8s-w3 | 192.168.20.103 |
+
+## Cloudfarmation으로 자동 배포
+
+### 0단계 : EC2 접속에 사용하는 SSH Key 생성
+
+[1단계: EC2 SSH 키 페어 생성](https://docs.aws.amazon.com/ko_kr/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
+
+1. AWS Management Console에서 AWS 리전 선택 : `ap-northeast-2 (서울)`
+2. 서비스 > EC2 > 네트워크 및 보안 > 키 페어 > 키 페어 생성
+3. 이름 : `doik-ec2-access-key-ap-northeast-2` / 키 페어 유형 : `RSA` *(공개키)* / 프라이빗 키 파일 형식 : `.ppk` *(PuTTY와 함께 사용)* > 키 페어 생성
+
+### 1단계 : 템플릿 지정
+
+- 준비된 템플릿
+- Amazon S3 URL
+
+![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%201.png)
+
+### 2단계 : 스택 세부 정보 지정
+
+1. 스택 이름 : `myk8s` *(기본)*
+2. 파라미터 : 아래 **빨간색** 부분은 **설정** 필요, **그 외** 부분은 **기본 값** 사용 권장.
+    - **<<<<< EC2 Node >>>>>**
+        - **KeyName** : 0단계에서 생성한 KeetPair 선택
+        - **SgIngressCidr** : EC2 인스턴스를 접속할 수 있는 IP 주소 입력 (`집 공인IP/32`) ← **보안그룹** : **모든 트래픽 허용**이니 주의!
+        - MasterNodeInstanceType & WorkerNodeInstanceType: 마스터 & 워커 노드 EC2 인스턴스의 타입 (기본 **t3.medium**) ⇒ 변경 가능
+        - Ec2EbsVolumeSize : EC2 인스턴스의 **EBS** 볼륨 크기 (GiB) ⇒ 변경 가능
+        - LatestAmiId : Ubuntu 22.04 LTS 최신 버전 AMI ID 가 자동 지정됨
+    - **<<<<< Region AZ >>>>>** : 리전과 가용영역을 지정
+    - **<<<<< VPC Subnet >>>>>** : VPC, 서브넷 정보 지정
+
+### 3단계 : 스택 옵션 구성
+
+- 패스
+
+### 4단계 : 검토
+
+- 내용 확인 > 스택 생성
+    
+    ![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%202.png)
+    
+- 인스턴스 생성 확인
+    
+    ![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%203.png)
+    
+    ![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%204.png)
+    
+
+### Trouble Shooting - EC2 접속
+
+- EC2 인스턴스 연결로 연결할 때 에러 발생
+    
+    ```jsx
+    There was a problem connecting to your instance
+    We were unable to connect to your instance. Make sure that your instance’s network settings are configured correctly for EC2 Instance Connect. For more information, see Task 1: Configure network access to an instance.
+    ```
+    
+    ![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%205.png)
+    
+
+```jsx
+**gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ sudo apt-get install ec2-instance-connect**
+	[sudo] password for gain:
+	Sorry, try again.
+	[sudo] password for gain:
+	Reading package lists... Done
+	Building dependency tree
+	Reading state information... Done
+	The following NEW packages will be installed:
+	  ec2-instance-connect
+	0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+	Need to get 12.8 kB of archives.
+	After this operation, 57.3 kB of additional disk space will be used.
+	Get:1 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 ec2-instance-connect all 1.1.12+dfsg1-0ubuntu3.20.04.1 [12.8 kB]
+	Fetched 12.8 kB in 1s (8959 B/s)
+	Selecting previously unselected package ec2-instance-connect.
+	(Reading database ... 32548 files and directories currently installed.)
+	Preparing to unpack .../ec2-instance-connect_1.1.12+dfsg1-0ubuntu3.20.04.1_all.deb ...
+	Created system user ec2-instance-connect
+	Unpacking ec2-instance-connect (1.1.12+dfsg1-0ubuntu3.20.04.1) ...
+	Setting up ec2-instance-connect (1.1.12+dfsg1-0ubuntu3.20.04.1) ...
+	Created symlink /etc/systemd/system/multi-user.target.wants/ec2-instance-connect.service → /lib/systemd/system/ec2-instance-connect.service.
+	System has not been booted with systemd as init system (PID 1). Can't operate.
+	Failed to connect to bus: Host is down
+	sshd override added, restarting daemon
+	System has not been booted with systemd as init system (PID 1). Can't operate.
+	Failed to connect to bus: Host is down
+	System has not been booted with systemd as init system (PID 1). Can't operate.
+	Failed to connect to bus: Host is down
+	dpkg: error processing package ec2-instance-connect (--configure):
+	 installed ec2-instance-connect package post-installation script subprocess returned error exit status 1
+	Errors were encountered while processing:
+	 ec2-instance-connect
+	E: Sub-process /usr/bin/dpkg returned an error code (1)
+```
+
+![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%206.png)
+
+## 클러스터 생성
+
+- `init.sh` : EC2 공통 적용, 도커 등 기본 설정, 계정(root / Pa55W0rd), [bat](https://github.com/sharkdp/bat) 툴 등 설치
+- `master.sh` : 쿠버네티스 초기화 구성 및 편리 설정, 파드 대역(172.16.0.0), 서비스 대역(10.200.1.0/24)
+- `worker.sh` : 마스터 노드 Join, kubeconfig 파일 가져오기
+- `final.sh` : CNI/CSI 설치 등
+
+### setup
+
+1. Master Node 접속
+    - pem 키로 ssh 접속하면 따로 password 필요없는 줄 알았는데 password 요구하더라.. 그래서 입력해 줘서 겨우 접속 완!
+        
+        ```jsx
+        **gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ssh -i ./myk8s-ec2-access-key-ap-northeast-2.pem root@52.78.18.102**
+        	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        	@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+        	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        	Permissions 0777 for './myk8s-ec2-access-key-ap-northeast-2.pem' are too open.
+        	It is required that your private key files are NOT accessible by others.
+        	This private key will be ignored.
+        	Load key "./myk8s-ec2-access-key-ap-northeast-2.pem": bad permissions
+        	**root@52.78.18.102's password:**
+        	
+        	Welcome to Ubuntu 22.04 LTS (GNU/Linux 5.15.0-1005-aws x86_64)
+        	
+        	 * Documentation:  https://help.ubuntu.com
+        	 * Management:     https://landscape.canonical.com
+        	 * Support:        https://ubuntu.com/advantage
+        	
+        	  System information as of Sun May 22 21:24:26 KST 2022
+        	
+        	  System load:  1.9853515625      Processes:                161
+        	  Usage of /:   9.0% of 38.60GB   Users logged in:          0
+        	  Memory usage: 21%               IPv4 address for docker0: 172.17.0.1
+        	  Swap usage:   0%                IPv4 address for ens5:    192.168.10.10
+        	
+        	
+        	16 updates can be applied immediately.
+        	12 of these updates are standard security updates.
+        	To see these additional updates run: apt list --upgradable
+        ```
+        
+2. 설치 로그 확인
+    
+    ```jsx
+    **(🍎 |kubernetes-admin@kubernetes:default) root@k8s-m:~# sudo tail -f /var/log/cloud-init-output.log**
+    	No services need to be restarted.
+    	
+    	No containers need to be restarted.
+    	
+    	No user sessions are running outdated binaries.
+    	
+    	No VM guests are running outdated hypervisor (qemu) binaries on this host.
+    	/nfs4-share     <world>(sync,wdelay,hide,no_subtree_check,sec=sys,rw,secure,no_root_squash,no_all_squash)
+    	>>>> K8S Controlplane Config End <<<<
+    	Cloud-init v. 22.1-14-g2e17a0d6-0ubuntu1~22.04.5 finished at Sun, 22 May 2022 12:24:19 +0000. Datasource DataSourceEc2Local.  Up 181.88 seconds
+    ```
+    
+3. CNI/StorageClass 등 ****설치 스크립트 실행
+    - Master Node SSH 종료 후 다시 SSH 접속
+    
+    ```jsx
+    **(🍎 |kubernetes-admin@kubernetes:default) root@k8s-m:~# exa -bghHliSR DOIK/**
+    	 inode Permissions Links Size Blocks User Group Date Modified Name
+    	516217 drwxr-xr-x      2    -      - root root  22 May 21:23  1
+    	516239 .rw-r--r--      1   55      8 root root  22 May 21:23  README.md
+    	
+    	DOIK/1:
+    	 inode Permissions Links  Size Blocks User Group Date Modified Name
+    	516232 .rw-r--r--      1   782      8 root root  22 May 21:23  1-3pods.yaml
+    	516233 .rw-r--r--      1 213Ki    432 root root  22 May 21:23  calico-crosssubnet-v3.22.2.yaml
+    	516234 .rwx------      1 1.2Ki      8 root root  22 May 21:23  final.sh
+    	516235 .rwx------      1 2.3Ki      8 root root  22 May 21:23  init.sh
+    	516236 .rwx------      1 1.9Ki      8 root root  22 May 21:23  master.sh
+    	516237 .rw-r--r--      1 4.1Ki     16 root root  22 May 21:23  metrics-server.yaml
+    	516238 .rwx------      1   971      8 root root  22 May 21:23  worker.sh
+    **(🍎 |kubernetes-admin@kubernetes:default) root@k8s-m:~# cd /root/DOIK/1 && ./final.sh && cd $HOME**
+    	+ echo '[TASK 10] Install Calico CNI'
+    	[TASK 10] Install Calico CNI
+    	+ kubectl apply -f https://raw.githubusercontent.com/gasida/DOIK/main/1/calico-crosssubnet-v3.22.2.yaml
+    	...중략...
+    	NAME: nfs-provisioner
+    	LAST DEPLOYED: Mon May 23 01:09:44 2022
+    	NAMESPACE: kube-system
+    	STATUS: deployed
+    	REVISION: 1
+    	TEST SUITE: None
+    ```
+    
+
+### 확인
+
+1. cluster 및 node 정보 확인
+    
+    ```jsx
+    **(🍎 |kubernetes-admin@kubernetes:default) root@k8s-m:~# kubectl cluster-info** 
+    	Kubernetes control plane is running at https://192.168.10.10:6443
+    	CoreDNS is running at https://192.168.10.10:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+    	
+    	To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+    **(🍎 |kubernetes-admin@kubernetes:default) root@k8s-m:~# kubectl get nodes -o wide**
+    	NAME     STATUS     ROLES                  AGE     VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE           KERNEL-VERSION    CONTAINER-RUNTIME
+    	k8s-m    NotReady   control-plane,master   3h40m   v1.23.6   192.168.10.10    <none>        Ubuntu 22.04 LTS   5.15.0-1005-aws   docker://20.10.16
+    	k8s-w1   NotReady   <none>                 3h39m   v1.23.6   192.168.10.101   <none>        Ubuntu 22.04 LTS   5.15.0-1005-aws   docker://20.10.16
+    	k8s-w2   NotReady   <none>                 3h39m   v1.23.6   192.168.10.102   <none>        Ubuntu 22.04 LTS   5.15.0-1005-aws   docker://20.10.16
+    	k8s-w3   NotReady   <none>                 3h39m   v1.23.6   192.168.20.103   <none>        Ubuntu 22.04 LTS   5.15.0-1005-aws   docker://20.10.16
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# systemctl status kubelet**
+    	● kubelet.service - kubelet: The Kubernetes Node Agent
+    	     Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+    	    Drop-In: /etc/systemd/system/kubelet.service.d
+    	             └─10-kubeadm.conf
+    	     Active: active (running) since Sun 2022-05-22 21:24:01 KST; 3h 50min ago
+    	       Docs: https://kubernetes.io/docs/home/
+    	   Main PID: 6426 (kubelet)
+    	      Tasks: 16 (limit: 4623)
+    	     Memory: 39.5M
+    	        CPU: 4min 17.733s
+    	     CGroup: /system.slice/kubelet.service
+    	             └─6426 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.co>
+    	May 23 01:09:55 k8s-m kubelet[6426]: E0523 01:09:55.691582    6426 plugins.go:752] "Error dynamically probing plugins" err="error creating>May 23 01:09:55 k8s-m kubelet[6426]: E0523 01:09:55.691782    6426 driver-call.go:262] Failed to unmarshal output for command: init, outpu>May 23 01:09:55 k8s-m kubelet[6426]: W0523 01:09:55.691796    6426 driver-call.go:149] FlexVolume: driver call failed: executable: /usr/li>May 23 01:09:55 k8s-m kubelet[6426]: E0523 01:09:55.691812    6426 plugins.go:752] "Error dynamically probing plugins" err="error creating>May 23 01:09:55 k8s-m kubelet[6426]: E0523 01:09:55.692032    6426 driver-call.go:262] Failed to unmarshal output for command: init, outpu>May 23 01:09:55 k8s-m kubelet[6426]: W0523 01:09:55.692048    6426 driver-call.go:149] FlexVolume: driver call failed: executable: /usr/li>May 23 01:09:55 k8s-m kubelet[6426]: E0523 01:09:55.692065    6426 plugins.go:752] "Error dynamically probing plugins" err="error creating>May 23 01:09:55 k8s-m kubelet[6426]: E0523 01:09:55.692552    6426 driver-call.go:262] Failed to unmarshal output for command: init, outpu>May 23 01:09:55 k8s-m kubelet[6426]: W0523 01:09:55.692563    6426 driver-call.go:149] FlexVolume: driver call failed: executable: /usr/li>May 23 01:09:55 k8s-m kubelet[6426]: E0523 01:09:55.692581    6426 plugins.go:752] "Error dynamically probing plugins" err="error creating>lines 1-23/23 (END)
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl get node -v7**
+    	I0523 01:15:39.343489   54205 loader.go:372] Config loaded from file:  /root/.kube/config
+    	I0523 01:15:39.350372   54205 round_trippers.go:463] GET https://192.168.10.10:6443/api/v1/nodes?limit=500
+    	I0523 01:15:39.350496   54205 round_trippers.go:469] Request Headers:
+    	I0523 01:15:39.350513   54205 round_trippers.go:473]     Accept: application/json;as=Table;v=v1;g=meta.k8s.io,application/json;as=Table;v=v1beta1;g=meta.k8s.io,application/json
+    	I0523 01:15:39.350612   54205 round_trippers.go:473]     User-Agent: kubectl/v1.23.6 (linux/amd64) kubernetes/ad33385
+    	I0523 01:15:39.358562   54205 round_trippers.go:574] Response Status: 200 OK in 7 milliseconds
+    	NAME     STATUS   ROLES                  AGE     VERSION
+    	k8s-m    Ready    control-plane,master   3h51m   v1.23.6
+    	k8s-w1   Ready    <none>                 3h51m   v1.23.6
+    	k8s-w2   Ready    <none>                 3h51m   v1.23.6
+    	k8s-w3   Ready    <none>                 3h51m   v1.23.6
+    ```
+    
+    ![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%207.png)
+    
+2. kube-system 확인
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl get pod -A**
+    	NAMESPACE            NAME                                                              READY   STATUS    RESTARTS   AGE
+    	kube-system          calico-kube-controllers-7c845d499-v5qfh                           1/1     Running   0          6m52s
+    	kube-system          calico-node-cpwhx                                                 1/1     Running   0          6m52s
+    	kube-system          calico-node-njvrx                                                 1/1     Running   0          6m52s
+    	kube-system          calico-node-sn7tg                                                 1/1     Running   0          6m52s
+    	kube-system          calico-node-x4r8b                                                 1/1     Running   0          6m52s
+    	kube-system          coredns-64897985d-856gx                                           1/1     Running   0          3h52m
+    	kube-system          coredns-64897985d-m7l58                                           1/1     Running   0          3h52m
+    	kube-system          etcd-k8s-m                                                        1/1     Running   0          3h52m
+    	kube-system          kube-apiserver-k8s-m                                              1/1     Running   0          3h52m
+    	kube-system          kube-controller-manager-k8s-m                                     1/1     Running   0          3h52m
+    	kube-system          kube-proxy-dvcnf                                                  1/1     Running   0          3h52m
+    	kube-system          kube-proxy-gxb6c                                                  1/1     Running   0          3h52m
+    	kube-system          kube-proxy-ts8ht                                                  1/1     Running   0          3h52m
+    	kube-system          kube-proxy-x6kkd                                                  1/1     Running   0          3h52m
+    	kube-system          kube-scheduler-k8s-m                                              1/1     Running   0          3h52m
+    	kube-system          metrics-server-6c8bfb487b-r8zs2                                   1/1     Running   0          6m44s
+    	kube-system          nfs-provisioner-nfs-subdir-external-provisioner-7d9776885d5b7h5   1/1     Running   0          6m38s
+    	local-path-storage   local-path-provisioner-dbd774c5c-tjfnh                            1/1     Running   0          6m44s
+    ```
+    
+3. Calico CNI 확인
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# calicoctl get ippool -o wide**
+    	NAME                  CIDR            NAT    IPIPMODE      VXLANMODE   DISABLED   DISABLEBGPEXPORT   SELECTOR   
+    	default-ipv4-ippool   172.16.0.0/16   true   CrossSubnet   Never       false      false              all()
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# calicoctl node status**
+    	Calico process is running.
+    	
+    	IPv4 BGP status
+    	+----------------+-------------------+-------+----------+-------------+
+    	|  PEER ADDRESS  |     PEER TYPE     | STATE |  SINCE   |    INFO     |
+    	+----------------+-------------------+-------+----------+-------------+
+    	| 192.168.10.101 | node-to-node mesh | up    | 16:10:18 | Established |
+    	| 192.168.10.102 | node-to-node mesh | up    | 16:10:20 | Established |
+    	| 192.168.20.103 | node-to-node mesh | up    | 16:10:18 | Established |
+    	+----------------+-------------------+-------+----------+-------------+
+    	
+    	IPv6 BGP status
+    	No IPv6 peers found.
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# calicoctl ipam show --show-blocks**
+    	+----------+-----------------+-----------+------------+--------------+
+    	| GROUPING |      CIDR       | IPS TOTAL | IPS IN USE |   IPS FREE   |
+    	+----------+-----------------+-----------+------------+--------------+
+    	| IP Pool  | 172.16.0.0/16   |     65536 | 9 (0%)     | 65527 (100%) |
+    	| Block    | 172.16.116.0/24 |       256 | 1 (0%)     | 255 (100%)   |
+    	| Block    | 172.16.158.0/24 |       256 | 1 (0%)     | 255 (100%)   |
+    	| Block    | 172.16.184.0/24 |       256 | 6 (2%)     | 250 (98%)    |
+    	| Block    | 172.16.24.0/24  |       256 | 1 (0%)     | 255 (100%)   |
+    	+----------+-----------------+-----------+------------+--------------+
+    ```
+    
+4. storageclasses 확인
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl get storageclasses**
+    	NAME                   PROVISIONER                                                     RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+    	local-path (default)   rancher.io/local-path                                           Delete          WaitForFirstConsumer   false                  11m
+    	nfs-client             cluster.local/nfs-provisioner-nfs-subdir-external-provisioner   Delete          Immediate              true                   11m
+    ```
+    
+5. 볼륨 확인
+    
+    ```jsx
+    (🍎 |DOIK-Lab:default) root@k8s-m:~# lsblk                                                                                                 PANSION   AGE
+    	NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS                                                                                                    11m
+    	loop0          7:0    0 26.6M  1 loop /snap/amazon-ssm-agent/5163                                                                                    11m
+    	loop1          7:1    0 55.5M  1 loop /snap/core18/2344
+    	loop2          7:2    0 61.9M  1 loop /snap/core20/1434
+    	loop3          7:3    0 79.9M  1 loop /snap/lxd/22923
+    	loop4          7:4    0 44.7M  1 loop /snap/snapd/15534
+    	nvme0n1      259:0    0   40G  0 disk
+    	├─nvme0n1p1  259:1    0 39.9G  0 part /
+    	├─nvme0n1p14 259:2    0    4M  0 part
+    	└─nvme0n1p15 259:3    0  106M  0 part /boot/efi
+    (🍎 |DOIK-Lab:default) root@k8s-m:~# df -h -T -t ext4
+    	Filesystem     Type  Size  Used Avail Use% Mounted on
+    	/dev/root      ext4   39G  4.4G   35G  12% /
+    (🍎 |DOIK-Lab:default) root@k8s-m:~# duf
+    	╭─────────────────────────────────────────────────────────────────────────────────────────────╮
+    	│ 2 local devices                                                                             │
+    	├────────────┬────────┬──────┬───────┬───────────────────────────────┬──────┬─────────────────┤
+    	│ MOUNTED ON │   SIZE │ USED │ AVAIL │              USE%             │ TYPE │ FILESYSTEM      │
+    	├────────────┼────────┼──────┼───────┼───────────────────────────────┼──────┼─────────────────┤
+    	│ /          │  38.6G │ 4.3G │ 34.2G │ [##..................]  11.2% │ ext4 │ /dev/root       │
+    	│ /boot/efi  │ 104.4M │ 5.2M │ 99.1M │ [....................]   5.0% │ vfat │ /dev/nvme0n1p15 │
+    	╰────────────┴────────┴──────┴───────┴───────────────────────────────┴──────┴─────────────────╯
+    	╭───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+    	│ 8 special devices                                                                                             │
+    	├─────────────────────────────┬────────┬───────┬────────┬───────────────────────────────┬──────────┬────────────┤
+    	│ MOUNTED ON                  │   SIZE │  USED │  AVAIL │              USE%             │ TYPE     │ FILESYSTEM │
+    	├─────────────────────────────┼────────┼───────┼────────┼───────────────────────────────┼──────────┼────────────┤
+    	│ /dev                        │   1.9G │    0B │   1.9G │                               │ devtmpfs │ devtmpfs   │
+    	│ /dev/shm                    │   1.9G │    0B │   1.9G │                               │ tmpfs    │ tmpfs      │
+    	│ /run                        │ 773.1M │  1.9M │ 771.2M │ [....................]   0.2% │ tmpfs    │ tmpfs      │
+    	│ /run/lock                   │   5.0M │    0B │   5.0M │                               │ tmpfs    │ tmpfs      │
+    	│ /run/snapd/ns               │ 773.1M │  1.9M │ 771.2M │ [....................]   0.2% │ tmpfs    │ tmpfs      │
+    	│ /run/user/0                 │ 386.6M │  4.0K │ 386.6M │ [....................]   0.0% │ tmpfs    │ tmpfs      │
+    	│ /var/lib/kubelet/pods/423fc │   3.7G │ 12.0K │   3.7G │ [....................]   0.0% │ tmpfs    │ tmpfs      │
+    	│ 781-c2f8-4e05-ba30-078de928 │        │       │        │                               │          │            │
+    	│ 9454/volumes/kubernetes.io~ │        │       │        │                               │          │            │
+    	│ projected/kube-api-access-s │        │       │        │                               │          │            │
+    	│ z5c2                        │        │       │        │                               │          │            │
+    	│ /var/lib/kubelet/pods/cf06f │   3.7G │ 12.0K │   3.7G │ [....................]   0.0% │ tmpfs    │ tmpfs      │
+    	│ 924-bc28-4746-84e8-adb8e488 │        │       │        │                               │          │            │
+    	│ 880d/volumes/kubernetes.io~ │        │       │        │                               │          │            │
+    	│ projected/kube-api-access-k │        │       │        │                               │          │            │
+    	│ rm98                        │        │       │        │                               │          │            │
+    	╰─────────────────────────────┴────────┴───────┴────────┴───────────────────────────────┴──────────┴────────────╯
+    (🍎 |DOIK-Lab:default) root@k8s-m:~# duf -all
+    	╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+    	│ 22 local devices                                                                                                    │
+    	├─────────────────────────────┬────────┬───────┬───────┬───────────────────────────────┬────────────┬─────────────────┤
+    	│ MOUNTED ON                  │   SIZE │  USED │ AVAIL │              USE%             │ TYPE       │ FILESYSTEM      │
+    	├─────────────────────────────┼────────┼───────┼───────┼───────────────────────────────┼────────────┼─────────────────┤
+    	│ /                           │  38.6G │  4.3G │ 34.2G │ [##..................]  11.2% │ ext4       │ /dev/root       │
+    	│ /boot/efi                   │ 104.4M │  5.2M │ 99.1M │ [....................]   5.0% │ vfat       │ /dev/nvme0n1p15 │
+    	│ /proc/fs/nfsd               │     0B │    0B │    0B │                               │ nfsd       │ nfsd            │
+    	│ /run/credentials/systemd-sy │     0B │    0B │    0B │                               │ ramfs      │ none            │
+    	│ susers.service              │        │       │       │                               │            │                 │
+    	│ /run/rpc_pipefs             │     0B │    0B │    0B │                               │ rpc_pipefs │ sunrpc          │
+    	│ /snap/amazon-ssm-agent/5163 │  26.8M │ 26.8M │    0B │ [####################] 100.0% │ squashfs   │ /dev/loop0      │
+    	│ /snap/core18/2344           │  55.6M │ 55.6M │    0B │ [####################] 100.0% │ squashfs   │ /dev/loop1      │
+    	│ /snap/core20/1434           │  62.0M │ 62.0M │    0B │ [####################] 100.0% │ squashfs   │ /dev/loop2      │
+    	│ /snap/lxd/22923             │  80.0M │ 80.0M │    0B │ [####################] 100.0% │ squashfs   │ /dev/loop3      │
+    	│ /snap/snapd/15534           │  44.8M │ 44.8M │    0B │ [####################] 100.0% │ squashfs   │ /dev/loop4      │
+    	│ /var/lib/docker/overlay2/09 │  38.6G │  4.3G │ 34.2G │ [##..................]  11.2% │ overlay    │ overlay         │
+    	│ 040056f296a22c63e56c38ce277 │        │       │       │                               │            │                 │
+    	│ f68574fe9e90679bce7bf73ea9a │        │       │       │                               │            │                 │
+    	│ ae66f5a0/merged             │        │       │       │                               │            │                 │
+    	//...중략...
+    	│ /var/lib/docker/overlay2/c4 │  38.6G │  4.3G │ 34.2G │ [##..................]  11.2% │ overlay    │ overlay         │
+    	│ bbcbdf897eb422bb39142ef281a │        │       │       │                               │            │                 │
+    	│ 427e298571d4cc3021d406b78ec │        │       │       │                               │            │                 │
+    	│ aef96587/merged             │        │       │       │                               │            │                 │
+    	╰─────────────────────────────┴────────┴───────┴───────┴───────────────────────────────┴────────────┴─────────────────╯
+    	╭───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+    	│ 31 special devices                                                                                                │
+    	├─────────────────────────────┬────────┬───────┬────────┬───────────────────────────────┬─────────────┬─────────────┤
+    	│ MOUNTED ON                  │   SIZE │  USED │  AVAIL │              USE%             │ TYPE        │ FILESYSTEM  │
+    	├─────────────────────────────┼────────┼───────┼────────┼───────────────────────────────┼─────────────┼─────────────┤
+    	│ /dev                        │   1.9G │    0B │   1.9G │                               │ devtmpfs    │ devtmpfs    │
+    	//...중략...
+    	│ /var/lib/kubelet/pods/cf06f │   3.7G │ 12.0K │   3.7G │ [....................]   0.0% │ tmpfs       │ tmpfs       │
+    	│ 924-bc28-4746-84e8-adb8e488 │        │       │        │                               │             │             │
+    	│ 880d/volumes/kubernetes.io~ │        │       │        │                               │             │             │
+    	│ projected/kube-api-access-k │        │       │        │                               │             │             │
+    	│ rm98                        │        │       │        │                               │             │             │
+    	╰─────────────────────────────┴────────┴───────┴────────┴───────────────────────────────┴─────────────┴─────────────╯
+    	
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# exportfs -v**
+    	/nfs4-share     <world>(sync,wdelay,hide,no_subtree_check,sec=sys,rw,secure,no_root_squash,no_all_squash)
+    ```
+    
+6. EC2 기본 정보 확인 *(옵션)*
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# hostnamectl** 
+    	 Static hostname: k8s-m
+    	       Icon name: computer-vm
+    	         Chassis: vm
+    	      Machine ID: ec2183cac29bcaba0c31a1f551bff9a3
+    	         Boot ID: 3e124726ada340d695ba717566b490e2
+    	  Virtualization: amazon
+    	Operating System: Ubuntu 22.04 LTS
+    	          Kernel: Linux 5.15.0-1005-aws
+    	    Architecture: x86-64
+    	 Hardware Vendor: Amazon EC2
+    	  Hardware Model: t3.medium
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# cat /etc/hostname** 
+    	───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────       │ File: /etc/hostname
+    	───────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────   1   │ k8s-m
+    	───────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────(🍎 |DOIK-Lab:default) root@k8s-m:~# cat /etc/hosts
+    	───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────       │ File: /etc/hosts
+    	───────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────   1   │ 127.0.0.1 localhost
+    	   2   │
+    	   3   │ # The following lines are desirable for IPv6 capable hosts
+    	   4   │ ::1 ip6-localhost ip6-loopback
+    	   5   │ fe00::0 ip6-localnet
+    	   6   │ ff00::0 ip6-mcastprefix
+    	   7   │ ff02::1 ip6-allnodes
+    	   8   │ ff02::2 ip6-allrouters
+    	   9   │ ff02::3 ip6-allhosts
+    	  10   │ 192.168.10.10 k8s-m
+    	  11   │ 192.168.10.101 k8s-w1
+    	  12   │ 192.168.10.102 k8s-w2
+    	  13   │ 192.168.20.103 k8s-w3
+    	  14   │ 192.168.20.104 k8s-w4
+    	───────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────(🍎 |DOIK-Lab:default) root@k8s-m:~# ip -br -c -4 addr
+    	lo               UNKNOWN        127.0.0.1/8 
+    	ens5             UP             192.168.10.10/24 metric 100
+    	docker0          DOWN           172.17.0.1/16
+    	tunl0@NONE       UNKNOWN        172.16.116.0/32
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# cat /etc/resolv.conf** 
+    	───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────       │ File: /etc/resolv.conf
+    	───────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────   1   │ # This is /run/systemd/resolve/stub-resolv.conf managed by man:systemd-resolved(8).
+    	   2   │ # Do not edit.
+    	   3   │ #
+    	   4   │ # This file might be symlinked as /etc/resolv.conf. If you're looking at
+    	   5   │ # /etc/resolv.conf and seeing this text, you have followed the symlink.
+    	   6   │ #
+    	   7   │ # This is a dynamic resolv.conf file for connecting local clients to the
+    	   8   │ # internal DNS stub resolver of systemd-resolved. This file lists all
+    	   9   │ # configured search domains.
+    	  10   │ #
+    	  11   │ # Run "resolvectl status" to see details about the uplink DNS servers
+    	  12   │ # currently in use.
+    	  13   │ #
+    	  14   │ # Third party programs should typically not access this file directly, but only
+    	  15   │ # through the symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a
+    	  16   │ # different way, replace this symlink by a static file or a different symlink.
+    	  17   │ #
+    	  18   │ # See man:systemd-resolved.service(8) for details about the supported modes of
+    	  19   │ # operation for /etc/resolv.conf.
+    	  20   │
+    	  21   │ nameserver 127.0.0.53
+    	  22   │ options edns0 trust-ad
+    	  23   │ search ap-northeast-2.compute.internal
+    	───────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────(🍎 |DOIK-Lab:default) root@k8s-m:~# resolvectl status
+    	Global
+    	       Protocols: -LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+    	resolv.conf mode: stub
+    	
+    	Link 2 (ens5)
+    	    Current Scopes: DNS
+    	         Protocols: +DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+    	Current DNS Server: 192.168.0.2
+    	       DNS Servers: 192.168.0.2
+    	        DNS Domain: ap-northeast-2.compute.internal
+    	
+    	Link 3 (docker0)
+    	Current Scopes: none
+    	     Protocols: -DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+    	
+    	Link 4 (tunl0)
+    	Current Scopes: none
+    	     Protocols: -DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# ip -c route**
+    	default via 192.168.10.1 dev ens5 proto dhcp src 192.168.10.10 metric 100 
+    	172.16.24.0/24 via 192.168.20.103 dev tunl0 proto bird onlink
+    	blackhole 172.16.116.0/24 proto bird
+    	172.16.158.0/24 via 192.168.10.101 dev ens5 proto bird
+    	172.16.184.0/24 via 192.168.10.102 dev ens5 proto bird
+    	172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown
+    	192.168.0.2 via 192.168.10.1 dev ens5 proto dhcp src 192.168.10.10 metric 100
+    	192.168.10.0/24 dev ens5 proto kernel scope link src 192.168.10.10 metric 100
+    	192.168.10.1 dev ens5 proto dhcp scope link src 192.168.10.10 metric 100
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# iptables -t filter -S**
+    //...생략...
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# iptables -t nat -S**
+    //...생략...
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# systemctl list-unit-files | grep 'enabled'**
+    //...생략...
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# lsmod**
+    //...생략...
+    ```
+    
+7. 모니터링 *(옵션)*
+    
+    ```jsx
+    (🍎 |DOIK-Lab:default) root@k8s-m:~# docker run --rm -it --name gtop --net='host' --pid="host" aksakalli/gtop
+    ```
+    
+    ![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%208.png)
+    
+
+### **스테이트풀셋 & 헤드리스서비스** 실습
+
+1. pod 배포
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# curl -s -O https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/application/w                                              ┌─────────────┐ │eb/web.yaml                                                                                                                                                                              │CPU1   9.0%  │ │
+    (🍎 |DOIK-Lab:default) root@k8s-m:~# cat web.yaml                                                                                                                                        │CPU2  10.0%  │ │**
+    	───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────                                              └─────────────┘ │       │ File: web.yaml                                                                                                                    ⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⠤⠤⠒⠁    ⠈      │
+    	───────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒    │   1   │ apiVersion: v1                                                                                                                                                                                  │
+    	   2   │ kind: Service                                                                                                                                                                                   │
+    	   3   │ metadata:                                                                                                                         ──────────────────────────────────────────────────────────────┘
+    	   4   │   name: nginx                                                                                                                     ory──────────────────────────────────────────────────────────┐ 
+    	   5   │   labels:                                                                                                                                                 ⢸⣿⠁33%⢹⣿                             │ 
+    	   6   │     app: nginx                                                                                                                                            ⠘⢿⣧⣄⣀⣤⣿⠟                             │ 
+    	   7   │ spec:                                                                                                                                                                                          │ 
+    	   8   │   ports:                                                                                                                          ─────────────────────────────────────────────────────────────┘ 
+    	   9   │   - port: 80                                                                                                                      p────────────────────────────────────────────────────────────┐ 
+    	  10   │     name: web                                                                                                                                             ⢸⣿⠁ 0%⢹⣿                             │ 
+    	  11   │   clusterIP: None                                                                                                                                         ⠘⢿⣧⣄⣀⣤⣿⠟                             │ 
+    	  12   │   selector:                                                                                                                                                                                    │ 
+    	  13   │     app: nginx                                                                                                                    ─────────────────────────────────────────────────────────────┘ 
+    	  14   │ ---
+    	  15   │ apiVersion: apps/v1                                                                                                               ──────────────────────────────────────────────────────────────┐
+    	  16   │ kind: StatefulSet                                                                                                                  %MEM                                                         │
+    	  17   │ metadata:                                                                                                                                                                                       │
+    	  18   │   name: web                                                                                                                         0.3                                                         │
+    	  19   │ spec:                                                                                                                               0.0                                                         │
+    	  20   │   serviceName: "nginx"                                                                                                              0.0                                                         │
+    	  21   │   replicas: 2
+    	  22   │   selector:
+    	  23   │     matchLabels:
+    	  24   │       app: nginx
+    	  25   │   template:
+    	  26   │     metadata:
+    	  27   │       labels:
+    	  28   │         app: nginx
+    	  29   │     spec:
+    	  30   │       containers:
+    	  31   │       - name: nginx
+    	  32   │         image: k8s.gcr.io/nginx-slim:0.8
+    	  33   │         ports:
+    	  34   │         - containerPort: 80
+    	  35   │           name: web
+    	  36   │         volumeMounts:
+    	  37   │         - name: www
+    	  38   │           mountPath: /usr/share/nginx/html
+    	  39   │   volumeClaimTemplates:
+    	  40   │   - metadata:
+    	  41   │       name: www
+    	  42   │     spec:
+    	  43   │       accessModes: [ "ReadWriteOnce" ]
+    	  44   │       resources:
+    	  45   │         requests:
+    	  46   │           storage: 1Gi
+    	  47   │
+    	───────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl apply -f web.yaml && kubectl get pods -w -l app=nginx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl apply -f web.yaml && kubectl get pods -w -l app=nginx**
+    	service/nginx created
+    	statefulset.apps/web created
+    	NAME    READY   STATUS    RESTARTS   AGE
+    	web-0   0/1     Pending   0          0s
+    	web-0   0/1     Pending   0          9s
+    	web-0   0/1     ContainerCreating   0          9s
+    	web-0   0/1     ContainerCreating   0          9s
+    	web-0   1/1     Running             0          18s
+    	web-1   0/1     Pending             0          0s
+    	web-1   0/1     Pending             0          10s
+    	web-1   0/1     ContainerCreating   0          10s
+    	web-1   0/1     ContainerCreating   0          11s
+    	web-1   1/1     Running             0          20s
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# for i in 0 1; do kubectl exec "web-$i" -- sh -c 'hostname'; done**
+    	web-0
+    	web-1
+    ```
+    
+    - 다른 터미널로 모니터링
+        
+        ![Untitled](0%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5_%E1%84%87%E1%85%A1%E1%84%82%E1%85%B5%E1%86%AF%E1%84%85%E1%85%A1%20%E1%84%8F%E1%85%AE%E1%84%87%E1%85%A5%E1%84%82%E1%85%A6%E1%84%90%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%20%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%20%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9_%E1%84%8C%E1%85%A1%E1%86%A8%E1%84%89%E1%85%A5%E1%86%BC%200d50674fa9034113b85ff8b448abaf0f/Untitled%209.png)
+        
+2. netshoot 이미지로 netdebug 파드에 zsh 실행
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl run -it --rm netdebug --image=nicolaka/netshoot --restart=Never -- zsh**
+    
+    	If you don't see a command prompt, try pressing enter.
+    	
+    	                    dP            dP                           dP
+    	                    88            88                           88
+    	88d888b. .d8888b. d8888P .d8888b. 88d888b. .d8888b. .d8888b. d8888P
+    	88'  `88 88ooood8   88   Y8ooooo. 88'  `88 88'  `88 88'  `88   88
+    	88    88 88.  ...   88         88 88    88 88.  .88 88.  .88   88
+    	dP    dP `88888P'   dP   `88888P' dP    dP `88888P' `88888P'   dP
+    	
+    	Welcome to Netshoot! (github.com/nicolaka/netshoot)
+    	
+    	
+    	
+    	 **netdebug  ~ 
+    	
+    	 netdebug  ~  nslookup nginx**
+    		Server:         10.200.1.10
+    		Address:        10.200.1.10#53
+    		
+    		Name:   nginx.default.svc.cluster.local
+    		Address: 172.16.24.2
+    		Name:   nginx.default.svc.cluster.local
+    		Address: 172.16.158.2
+    	
+    	
+    	 **netdebug  ~  nslookup -type=srv nginx**     
+    		Server:         10.200.1.10
+    		Address:        10.200.1.10#53
+    		
+    		nginx.default.svc.cluster.local service = 0 50 80 web-0.nginx.default.svc.cluster.local.
+    		nginx.default.svc.cluster.local service = 0 50 80 web-1.nginx.default.svc.cluster.local.
+    		
+    	
+    	 **netdebug  ~  nslookup web-0.nginx**
+    		Server:         10.200.1.10
+    		Address:        10.200.1.10#53
+    		
+    		Name:   web-0.nginx.default.svc.cluster.local
+    		Address: 172.16.158.2
+    	
+    	
+    	 **netdebug  ~  nslookup web-1.nginx**
+    		Server:         10.200.1.10
+    		Address:        10.200.1.10#53
+    		
+    		Name:   web-1.nginx.default.svc.cluster.local
+    		Address: 172.16.24.2
+    		
+    	
+    	 **netdebug  ~  exit**
+    		pod "netdebug" deleted
+    ```
+    
+3. 파드 삭제 실행 후 재실행 시 생성 순서 확인
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl delete pod -l app=nginx && kubectl get pods -w -l app=nginx**
+    		pod "web-0" deleted
+    		pod "web-1" deleted
+    		NAME    READY   STATUS              RESTARTS   AGE
+    		web-0   0/1     ContainerCreating   0          1s
+    		web-0   1/1     Running             0          2s
+    		web-1   0/1     Pending             0          0s
+    		web-1   0/1     Pending             0          0s
+    		web-1   0/1     ContainerCreating   0          0s
+    		web-1   0/1     ContainerCreating   0          1s
+    		web-1   1/1     Running             0          2s
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# for i in 0 1; do kubectl exec web-$i -- sh -c 'hostname'; done**
+    	web-0
+    	web-1
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl run -it --rm netdebug --image=nicolaka/netshoot --restart=Never -- zsh**
+    	If you don't see a command prompt, try pressing enter.
+    	                    dP            dP                           dP   
+    	                    88            88                           88
+    	88d888b. .d8888b. d8888P .d8888b. 88d888b. .d8888b. .d8888b. d8888P
+    	88'  `88 88ooood8   88   Y8ooooo. 88'  `88 88'  `88 88'  `88   88
+    	88    88 88.  ...   88         88 88    88 88.  .88 88.  .88   88
+    	dP    dP `88888P'   dP   `88888P' dP    dP `88888P' `88888P'   dP
+    	
+    	Welcome to Netshoot! (github.com/nicolaka/netshoot)
+    	
+    	
+    	
+    	 **netdebug  ~  nslookup nginx**
+    		Server:         10.200.1.10
+    		Address:        10.200.1.10#53
+    	
+    		Name:   nginx.default.svc.cluster.local
+    		Address: 172.16.24.4
+    		Name:   nginx.default.svc.cluster.local
+    		Address: 172.16.158.3
+    	
+    	
+    	 **netdebug  ~  nslookup -type=srv nginx**
+    		Server:         10.200.1.10
+    		Address:        10.200.1.10#53
+    		
+    		nginx.default.svc.cluster.local service = 0 50 80 web-0.nginx.default.svc.cluster.local.
+    		nginx.default.svc.cluster.local service = 0 50 80 web-1.nginx.default.svc.cluster.local.
+    		
+    	
+    	 **netdebug  ~  nslookup web-0.nginx**
+    		Server:         10.200.1.10
+    		Address:        10.200.1.10#53
+    		
+    		Name:   web-0.nginx.default.svc.cluster.local
+    		Address: 172.16.158.3
+    	
+    	
+    	 **netdebug  ~  nslookup web-1.nginx**
+    		Server:         10.200.1.10
+    		Address:        10.200.1.10#53
+    	
+    	**Name:   web-1.nginx.default.svc.cluster.local**
+    		Address: 172.16.24.4
+    	
+    	
+    	 **netdebug  ~  exit**
+    		pod "netdebug" deleted
+    ```
+    
+4. pvc 확인
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl get pvc -l app=nginx**
+    	NAME        STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+    	www-web-0   Bound    pvc-7cce446e-e68a-4783-99f9-fbb891538669   1Gi        RWO            local-path     11m
+    	www-web-1   Bound    pvc-7defb95e-8b02-4886-851b-e339e234fd71   1Gi        RWO            local-path     11m
+    ```
+    
+5. 웹 서버 index.html 에 hostname 추가 후 웹 접속 해서 확인
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# for i in 0 1; do kubectl exec "web-$i" -- sh -c 'echo "$(hostname)-pv-test" > /usr/share/nginx/html/index.html'; done
+    (🍎 |DOIK-Lab:default) root@k8s-m:~# for i in 0 1; do kubectl exec -i -t "web-$i" -- curl http://localhost/; done**
+    	web-0-pv-test
+    	web-1-pv-test
+    ```
+    
+6. 파드 삭제 실행 후 재실행 시 생성 순서 확인
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl delete pod -l app=nginx && kubectl get pods -w -l app=nginx**
+    	pod "web-0" deleted
+    	pod "web-1" deleted
+    	NAME    READY   STATUS              RESTARTS   AGE
+    	web-0   0/1     ContainerCreating   0          0s
+    	web-0   0/1     ContainerCreating   0          1s
+    	web-0   1/1     Running             0          2s
+    	web-1   0/1     Pending             0          0s
+    	web-1   0/1     Pending             0          0s
+    	web-1   0/1     ContainerCreating   0          0s
+    	web-1   0/1     ContainerCreating   0          1s
+    	web-1   1/1     Running             0          2s
+    ```
+    
+7. 웹 접속 해서 확인 : PV 저장소 확인
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# for i in 0 1; do kubectl exec -i -t "web-$i" -- curl http://localhost/; done**
+    	web-0-pv-test
+    	web-1-pv-test
+    ```
+    
+8. pod scale out & scale in
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl scale sts web --replicas=5 && kubectl get pods -w -l app=nginx**
+    	statefulset.apps/web scaled
+    	NAME    READY   STATUS    RESTARTS   AGE
+    	web-0   1/1     Running   0          88s
+    	web-1   1/1     Running   0          86s
+    	web-2   0/1     Pending   0          0s
+    	web-2   0/1     Pending   0          10s
+    	web-2   0/1     ContainerCreating   0          10s
+    	web-2   0/1     ContainerCreating   0          11s
+    	web-2   1/1     Running             0          18s
+    //...생략...
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl patch sts web -p '{"spec":{"replicas":3}}' && kubectl get pods -w -l app=nginx**
+    	statefulset.apps/web patched
+    	NAME    READY   STATUS        RESTARTS   AGE
+    	web-0   1/1     Running       0          2m54s
+    	web-1   1/1     Running       0          2m52s
+    	web-2   1/1     Running       0          86s
+    	web-3   1/1     Running       0          68s
+    	web-4   1/1     Terminating   0          61s
+    	web-4   1/1     Terminating   0          62s
+    	web-4   0/1     Terminating   0          62s
+    	web-4   0/1     Terminating   0          62s
+    	web-4   0/1     Terminating   0          62s
+    //...생략...
+    ```
+    
+9. 리소스 삭제
+    
+    ```jsx
+    **(🍎 |DOIK-Lab:default) root@k8s-m:~# kubectl delete -f web.yaml && kubectl delete pvc --all**
+    	service "nginx" deleted
+    	statefulset.apps "web" deleted
+    	persistentvolumeclaim "www-web-0" deleted
+    	persistentvolumeclaim "www-web-1" deleted
+    	persistentvolumeclaim "www-web-2" deleted
+    	persistentvolumeclaim "www-web-3" deleted
+    	persistentvolumeclaim "www-web-4" deleted
+    ```
