@@ -106,7 +106,7 @@ author:
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "게인개발용 블로그입니다."
   location         : "South Korea"
-  email            : "rkdlsdb@naver.com"
+  #email            : "rkdlsdb@naver.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
@@ -129,7 +129,7 @@ footer:
       url: "https://github.com/gain-yoo"
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
-      url: "https://www.instagram.com/gany_yy/""
+      url: "https://www.instagram.com/gany_yy/"
 
 
 # Reading Files
@@ -190,6 +190,11 @@ kramdown:
   enable_coderay: false
 
 
+# # TOC
+# toc:
+#   selectors: # "h1,h2,h3" (default)
+
+
 # Sass/SCSS
 sass:
   sass_dir: _sass
@@ -200,7 +205,7 @@ sass:
 permalink: /:categories/:title/
 paginate: 5 # amount of posts to show
 paginate_path: /page:num/
-timezone: Asia/Seoul
+timezone: #Asia/Seoul
 
 
 # Plugins (previously gems:)
@@ -237,16 +242,16 @@ tag_archive:
   type: liquid
   path: /tags/
 # https://github.com/jekyll/jekyll-archives
-# jekyll-archives:
-#   enabled:
-#     - categories
-#     - tags
-#   layouts:
-#     category: archive-taxonomy
-#     tag: archive-taxonomy
-#   permalinks:
-#     category: /categories/:name/
-#     tag: /tags/:name/
+jekyll-archives:
+  enabled:
+    - categories
+    - tags
+  layouts:
+    category: archive-taxonomy
+    tag: archive-taxonomy
+  permalinks:
+    category: /categories/:name/
+    tag: /tags/:name/
 
 
 # HTML Compression
@@ -266,6 +271,8 @@ defaults:
     values:
       layout: single
       author_profile: true
+      # aside:
+      #   toc: true
       read_time: true
       comments: true
       share: true
