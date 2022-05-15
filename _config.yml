@@ -103,7 +103,7 @@ analytics:
 # Site Author
 author:
   name             : "개인개발"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  avatar           : "/assets/images/jinro.png" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "바지런한 개발자되기😂"
   location         : "South Korea"
   #email            : "rkdlsdb@naver.com"
