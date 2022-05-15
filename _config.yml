@@ -15,7 +15,7 @@
 minimal_mistakes_skin    : "air" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
-locale                   : "ko-KR"
+locale                   : "en-US"
 title                    : "개인 블루그"
 title_separator          : "|"
 subtitle                 : # site tagline that appears below site title in masthead
@@ -25,7 +25,7 @@ url                      : "https://gain-yoo.github.io/"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
-logo                     : "/assets/images/t.JPG"
+logo                     : "/assets/images/snoopy2.JPG"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 breadcrumbs              : true # true, false (default)
 words_per_minute         : 200
@@ -102,24 +102,24 @@ analytics:
 
 # Site Author
 author:
-  name             : "개인 블루그"
+  name             : "개인개발"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "개인개발용 블로그입니다."
+  bio              : "바지런한 개발자되기😂"
   location         : "South Korea"
   #email            : "rkdlsdb@naver.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
       url: "mailto:rkdlsdb@naver.com"
-    - label: "Website"
-      icon: "fas fa-fw fa-link"
-      url: "https://gain-yoo.github.io"
+    # - label: "Website"
+    #   icon: "fas fa-fw fa-link"
+    #   url: "https://gain-yoo.github.io"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/gain-yoo"
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      url: "https://www.instagram.com/gany_yy/"
+    # - label: "Instagram"
+    #   icon: "fab fa-fw fa-instagram"
+    #   url: "https://www.instagram.com/gany_yy/"
 
 # Site Footer
 footer:
