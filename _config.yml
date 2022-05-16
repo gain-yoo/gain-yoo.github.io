@@ -20,7 +20,7 @@ title                    : "개인블루그"
 title_separator          : "|"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "GAINS"
-description              : "An amazing website."
+description              : "개인개발자의 개발개인블루그"
 url                      : "https://gain-yoo.github.io/"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
