@@ -72,7 +72,7 @@ root@master-node1:~# docker logs CONTAINERID
 - Container Runtime인 Docker를 제대로 설치하지 않아서 발생한 에러였습니다.
 	- Docker Engine에서 kubelet을 systemd 서비스로 관리하기 때문에 Kubernetes에서는 Docker 데몬의 드라이버를 systemd 드라이버로 권장합니다.
 	- 따라서 cgroup 드라이버는 systemd로 일치시켜야 하며 그렇지 않을 시 kubelet 프로세스는 실패하게 됩니다.
-	- `daemon.json` 파일 생성 → `kubeadm reset` → `kubeadm init`
+- `daemon.json` 파일 생성 → `kubeadm reset` → `kubeadm init`
     
 ```jsx
 root@master-node1:~# cat > /etc/docker/daemon.json <<EOF
