@@ -2,7 +2,8 @@
 layout: single
 title: "[Kubernetes] kubeadm init 에러"
 excerpt: "kubelet 프로세스 실패"
-categories: "Trouble Shooting"
+categories:
+- Trouble Shooting
 tag: [Kubernetes, DevOps, NCP, kubeadm, docker, Trouble Shooting, kubelet, systemd]
 toc: true
 author_profile: false
