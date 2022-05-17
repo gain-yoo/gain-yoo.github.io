@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: http://gain-yoo.github.io/sitemap.xml
