@@ -46,8 +46,9 @@ sidebar:
         - KT DNS Server IP : 168.126.63.1
 5. Sucurity Policy > Apply security policy : `OFF`
 6. Installation Destination > Local Standard Disks 클릭하지 말고 > 아래로 스크롤 > Other Storage Options : `I will configure partitioning` 체크 > `Done` 클릭 > `LVM` > `swap`, `/boot`, `/` 메모리 아래 사진과 같이 추가 > `Accept` > `Begin Installation`
-    
-    ![Untitled](1%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5%200a88c21f971841d09974f69d355e004c/Untitled.png)
+
+![Untitled](https://user-images.githubusercontent.com/100563973/169363382-bda62668-7ba8-4db9-8812-77348d22a740.png)
+
     
     - LVM(Logical Volume Manager)
         - 큰 디스크 용량이 필요하여 작게 쪼개어진 용량을 모은 볼륨 디스크
@@ -158,7 +159,6 @@ Q. 1M x 100개 or 100M x 1개 속도 빠른 것은?
         - 다중 장치 지원 및 확장된 케이블 길이, 더 빠른 전송 속도 및 마더 보드 또는 사용 가능한 커넥터에 다중 호스트 어댑터 설치 가능한 기능으로 가장 자주 사용됨
         - hot plug
         
-        ![Untitled](1%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5%200a88c21f971841d09974f69d355e004c/Untitled%201.png)
         
     - SATA(Serial ATA)
         - 하드디스크나 CD-ROM과 같이 데이터 전송이 주 목적
