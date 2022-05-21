@@ -125,7 +125,7 @@ sidebar:
     - DB + Server
 - Exadata
 
-## 3. 추가로 알
+## 3. 추가로 알아야 할 부분
 
 - **RAID**
 - **LVM**
