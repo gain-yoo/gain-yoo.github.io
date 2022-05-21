@@ -9,7 +9,35 @@ author_profile: false
 sidebar:
     nav: "docs"
 ---
-
+- [ ]  네 가지 인터페이스 방식에 대한 차이 공부해 오기
+    - IDE(Intelligent Drive Electronics)
+        - HDD, CD-ROM 등을 연결하는 40핀의 **병렬** 인터페이스 규격, 최대 16bit 전송
+        - 1개의 채널에 장치 2개씩 연결, 최대 4개
+        - 마스터, 슬레이브
+    - SCSI(Small Computer System Interface)
+        - **병렬**
+        - IDE 방식으로 불가능했던 데이터 처리 속도 한계 해소
+        - RAID 기능 등 부가 기능 사용 가능
+        - 가격 대비 최고 성능
+        - 다중 장치 지원 및 확장된 케이블 길이, 더 빠른 전송 속도 및 마더 보드 또는 사용 가능한 커넥터에 다중 호스트 어댑터 설치 가능한 기능으로 가장 자주 사용됨
+        - hot plug
+        
+        
+    - SATA(Serial ATA)
+        - 하드디스크나 CD-ROM과 같이 데이터 전송이 주 목적
+        - **직렬** 인터페이스 이용한 규격으로 독립적 작용
+        - 대역폭 높음
+    - NVMe
+        - 컴퓨터의 고속 PCIe 버스를 통해 SSD와 같은 플래시 메모리 저장 장치에 있는 데이터에 빠르게 액세스할 수 있게 해주는 전송 프로토콜
+        - **병렬**, 비휘발성
+- [ ]  LVM 공부해 오기
+    
+    [[소개] LVM(Logical Volume Manager) - 개념](https://tech.cloud.nongshim.co.kr/2018/11/23/lvmlogical-volume-manager-1-%EA%B0%9C%EB%85%90/)
+    
+- [ ]  oracle linux 설치해 오기 - 여러 번 설치 연습
+- 책 읽어오기
+    - [ ]  Part 03 Chapter 01 전체
+    - [ ]  Part 03 Chapter 02 Section 06 까지
 
 # 2. 부가 설명
 
