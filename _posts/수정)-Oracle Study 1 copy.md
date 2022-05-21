@@ -10,23 +10,16 @@ sidebar:
     nav: "docs"
 ---
 
-처음으로 데이터베이스에 대한 스터디를 시작했는데요..! 이번 포스팅에서는 Oracle을 설치하기 위해 VMware에 리눅스를 먼저 설치할 것입니다~  
+<aside>
+💡 RedHat 공식 문서
 
-  
+</aside>
+
 ## 1. 설치 과정 (VMware Workstation)
 
 ### Create a New Virtual Machine
-설치 과정은 아래와 같습니다.  
-  
-1. `Custom (advanced)` > `Workstation 16.2.x`
-2. `Installer disc image file (iso):` 해당 파일 선택 > 네이밍 규칙대로 이름 지정
-3. Number of processors : `1`, Number of cores per processor : `2`
-4. Memory for this virtual machine : `3072` MB
-5. `Use network address translation (NAT)`
-6. I/O Controller Types : `LSI Logic (Recommended)`
-7. Virtual disk type : `SCSI (Recommended)`
-8. Disk : `Create a new virtual disk` > Maximum disk size (GB) : `100GB`, `Store virtual disk as a single file`
-    - 1MB x 100개와 100MB x 1개의 속도를 비교해 본다면 100MB짜리 하나로 돌아가는 디스크가 더 빠르다는 것을 생각할 수 있다. 그래서 속도를 생각하여 `Store virtual disk as a single file`로 선택하였다.
+
+`Custom (advanced)` > `Workstation 16.2.x` > `Installer disc image file (iso):` 해당 파일 선택 > 네이밍 규칙대로 이름 지정 > Number of processors : `1`, Number of cores per processor : `2` >  Memory for this virtual machine : `3072` MB > `Use network address translation (NAT)` > I/O Controller Types : `LSI Logic (Recommended)` > Virtual disk type : `SCSI (Recommended)` > Disk : `Create a new virtual disk` > Maximum disk size (GB) : `100GB`, `Store virtual disk as a single file` (이게 더 빠름. 아까 100M x 1과 같은 이치)
 
 ### Linux OS 설치
 
