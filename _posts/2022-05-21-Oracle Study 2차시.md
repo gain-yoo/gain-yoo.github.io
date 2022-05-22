@@ -43,7 +43,7 @@ sidebar:
 - PE < Physical Volume < Volume Group
 - Logical Volume은 디렉토리에 mount해서 사용할 수 있는 Volume으로, Physical Volume에 포함되어 있는 여러 PE들을 합쳐서 구성
     
-    
+![Untitled](https://user-images.githubusercontent.com/100563973/169683495-0529e012-70fb-4454-8f22-b959bf262dec.png)
 
 ## Terminal
 
@@ -431,8 +431,8 @@ sidebar:
 19. Install Product
 20. Finish
     
-    ![Untitled](2%E1%84%8E%E1%85%A1%E1%84%89%E1%85%B5%208ac04b2abd1c4310b242fa0c8eb9ad3b/Untitled%201.png)
-    
+![Untitled 1](https://user-images.githubusercontent.com/100563973/169683514-64817e56-05e0-4eb7-bc03-7abaf02c6eca.png)
+
     ```jsx
     [oracle@gain_study oraInventory]$ su -
     	Password: 
