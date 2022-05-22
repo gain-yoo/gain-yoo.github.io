@@ -431,8 +431,8 @@ sidebar:
 19. Install Product
 20. Finish
     
-![Untitled 1](https://user-images.githubusercontent.com/100563973/169683514-64817e56-05e0-4eb7-bc03-7abaf02c6eca.png)
-
+    ![Untitled 1](https://user-images.githubusercontent.com/100563973/169683585-7b606043-f8d3-4a7e-8fa4-bfe42d6786f3.png)
+    
     ```jsx
     [oracle@gain_study oraInventory]$ su -
     	Password: 
