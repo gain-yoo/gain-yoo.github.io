@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "[Database/Oracle] VMware - Oracle 설치"
+title: "[Database/Oracle] VMware - Oracle 11g Release 2 설치"
 excerpt: "Oracle Study 2차시"
 categories: Database
 tag: [VMware, Database, DB, 데이터베이스, Linux, 리눅스, OS 설치, Virtual Machine, 가상환경, SCSI, Disk, Partitioning, 파티셔닝, Oracle, 오라클, mount, LVM, SWAP]
@@ -73,7 +73,7 @@ sidebar:
     ```
     
 
-# 2. Oracle 설치
+# 2. Oracle 11g Release 2 설치
   
 > 💡 **vi 편집기 옵션 알아두기**
 

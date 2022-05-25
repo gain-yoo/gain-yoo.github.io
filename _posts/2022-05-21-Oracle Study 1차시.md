@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "[Database/Oracle] VMware - Linux OS 설치"
+title: "[Database/Oracle] VMware - Oracle Linux 7.3 설치"
 excerpt: "Oracle Study 1차시"
 categories: Database
 tag: [VMware, Database, DB, 데이터베이스, Linux, 리눅스, OS 설치, Virtual Machine, 가상환경, SCSI, Disk, Partitioning, 파티셔닝, Oracle, 오라클, mount, LVM, SWAP]
@@ -33,7 +33,7 @@ sidebar:
 9. Maximum disk size (GB) : `100GB`, `Store virtual disk as a single file`
     - 1MB x 100개와 100MB x 1개의 속도를 비교해 본다면 100MB짜리 하나로 돌아가는 디스크가 더 빠르다는 것을 생각할 수 있다. 그래서 속도를 생각하여 `Store virtual disk as a single file`로 선택하였다. ⇒ **RAID** 관련
 
-### Linux OS 설치
+### Oracle Linux 7.3 설치
 
 1. 기본 값으로 설치 진행
 2. Software Selection > `Server with GUI` > `Compatibility Libraries`, `Development Tools` 체크
