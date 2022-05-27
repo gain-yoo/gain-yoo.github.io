@@ -1,7 +1,7 @@
 ---
 layout: single
 title: "[Database/Oracle] VMware - Oracle Linux 7.3 설치"
-excerpt: "Oracle Study 1차시"
+excerpt: "Oracle 스터디 1차시"
 categories: Database
 tag: [VMware, Database, DB, 데이터베이스, Linux, 리눅스, OS 설치, Virtual Machine, 가상환경, SCSI, Disk, Partitioning, 파티셔닝, Oracle, 오라클, mount, LVM, SWAP]
 toc: true

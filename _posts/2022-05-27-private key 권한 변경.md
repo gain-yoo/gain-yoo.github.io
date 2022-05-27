@@ -34,7 +34,7 @@ gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ssh -i ./myk8s.pem ubuntu@13.1
 Private Key를 User 외 다른 모든 사람이 읽거나 쓸 수 있는 경우 SSH는 Key를 무시하고 에러 메세지를 뱉어낸다고 한다.  
 그래서 최소한으로 User만 읽기 권한을 가져야 한다.
 
-참고 ) [인스턴스 연결 문제 해결](https://docs.aws.amazon.com/ko_kr/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#troubleshoot-unprotected-key)
+참고 ) [인스턴스 연결 문제 해결](https://docs.aws.amazon.com/ko_kr/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#troubleshoot-unprotected-key)  
 
 ```jsx
 gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ll myk8s.pem
@@ -44,7 +44,9 @@ gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ll myk8s.pem
 	-r-------- 1 gain gain 1678 May 27 14:59 myk8s.pem
 ```
 
-권한을 변경해 주니 아래와 같이 접속 성공!✌😁
+권한을 변경해 주니 아래와 같이 접속 성공!✌😁  
+  
+*권한 변경하려니 **에러 속의 에러** 발생! 이번엔 wsl 관련 문제였다. [[WSL] WSL2에서 chmod 미작동 에러 (ubuntu 20.04.4 LTS)](https://gain-yoo.github.io/trouble%20shooting/wsl_chmod/) 포스팅 참고*
 
 ```jsx
 gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ssh -i ./myk8s.pem ubuntu@13.125.127.182
