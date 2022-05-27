@@ -203,7 +203,7 @@ sass:
 
 # Outputting
 permalink: /:categories/:title/
-paginate: 5 # amount of posts to show
+paginate: 10 # amount of posts to show
 paginate_path: /page:num/
 timezone: #Asia/Seoul
 
@@ -273,10 +273,18 @@ defaults:
       author_profile: true
       # aside:
       #   toc: true
-      read_time: true
+      read_time: false
       comments: true
       share: true
       related: true
       show_date: true
-
+      sitemap: true
+  # _pages 
+  - scope:
+      path: "_pages"
+      type: pages
+    values:
+      layout: single
+      author_profile: true
+      
 date_format: "%Y-%m-%d"
