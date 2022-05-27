@@ -39,3 +39,12 @@ Study나 Trouble Shooting 포스팅합니다.
 > <u>2021.10 ~</u> MYDATA - **DevOps Engineer**
 >> <u>2021.10 ~</u> S사 전사 시스템 클라우드 전환 프로젝트
 >> - 클라우드 및 온프레미스 환경의 시스템을 컨테이너 환경으로 전환
+
+## Certifications
+- **Naver Cloud Platform Certified Professional** *(2022년 3월 24일)*
+- **MS Certified Azure Fundamental** *(2021년 8월 4일)*
+- **AWS Certified Solutions Architect – Professional** *(2021년 4월 4일)*
+- **ServiceNow Certified Implementation Specialist - Application Portfolio Management** *(2021년 4월 12일)*
+- **ServiceNow Certified System Administration** *(2021년 1월 15일)*
+- **ITIL V4 Foundation** *(2021년 7월 20일)*
+- **정보처리산업기사** *(2020년 11월 5일)*
