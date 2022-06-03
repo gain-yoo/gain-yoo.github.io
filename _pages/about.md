@@ -20,7 +20,7 @@ last_modified_at: 2022-05-27T19:50:03-05:00
 💥 블루그는 오타가 아닙니다. blue 언어유희랍니다😂  
 
 ## Profile
-Study나 Trouble Shooting 포스팅합니다.  
+Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리하여 포스팅하고 있습니다.  
   
 주로 kubernetes를 공부하고 있고, 최근 Database 스터디를 시작했습니다.
 
