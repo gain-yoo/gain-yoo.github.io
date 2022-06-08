@@ -17,7 +17,7 @@ last_modified_at: 2022-05-27T19:50:03-05:00
 ---
 
 ----
-💥 블루그는 오타가 아닙니다. blue 언어유희랍니다😂  
+💥 블루블로그😂  
 
 ## Profile
 Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리하여 포스팅하고 있습니다.  
@@ -49,5 +49,5 @@ Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리�
 - **ITIL V4 Foundation** *(2021년 7월 20일)*
 - **정보처리산업기사** *(2020년 11월 5일)*  
   
-<img src="https://user-images.githubusercontent.com/100563973/172617713-e34f7554-8610-499b-b205-a04897526b8d.png" width="200" height="200"/><img src="![azure-fundamentals-600x600](https://user-images.githubusercontent.com/100563973/172617816-e2886740-6a2d-4f78-b9f2-c9305072bcc8.png)" width="200" height="200"/>
+<img src="https://user-images.githubusercontent.com/100563973/172617713-e34f7554-8610-499b-b205-a04897526b8d.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/100563973/172617816-e2886740-6a2d-4f78-b9f2-c9305072bcc8.png" width="200" height="200"/>
 ![NCP_Badge](https://user-images.githubusercontent.com/100563973/172617883-315a98e9-ab88-4bcc-a35a-318e519d3c18.png)![ITIL®-4-Foundation-CPD-200x200](https://user-images.githubusercontent.com/100563973/172617903-c3c578ae-903e-4d16-ad8e-e51729cde8e6.png)
