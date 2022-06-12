@@ -1,7 +1,7 @@
 ---
 layout: single
-title: "[Database/Kubernetes/DOIK] Custom Resource Definition Install Error"
-excerpt: "Kubernetes에 MySQL Operator"
+title: "[Database/Kubernetes/DOIK] Prometheus로 수집한 metric으로 MySQL 데이터베이스의 HPA 조절하기 (1)"
+excerpt: "Kubernetes에 MySQL Operator/InnoDB Cluster/Prometheus Operator 설치하기_작성중"
 categories:
 - Database
 tag: [Kubernetes, 쿠버네티스, DevOps, AWS, CRD, CR, Custom Resource, 커스텀 리소스, MySQL Operator, MySQL InnoDB Cluster, Helm, 프로메테우스, Prometheus Operator, kube-prometheus]
