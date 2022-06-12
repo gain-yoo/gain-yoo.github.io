@@ -10,32 +10,77 @@ author_profile: false
 sidebar:
     nav: "docs"
 ---
-
-최근에 HPA 설정에 관해 작업하고 있었고, cpu 및 메모리 리소스 대신 다른 자원을 metric으로 수집하지 못할까 궁금했다. 그러던 중에 **Promethues**를 **Custom Resource**로 생성할 수 있다는 사실을 알고 흥미를 갖는 중이었다.  
   
-마침 타이밍이 딱 좋게 스터디에서도 Custom Resource가 언급되었고 바로 <u>Database와 Prometheus를 결합</u>한 실습을 해야겠다 생각했다.  
-  
-그래서 이번 포스팅에서 **<u>MySQL Operator, InnoDB Cluster, Prometheus Operator</u>**를 설치부터 해 볼 것이다.  
-*(사실 Prometheus Operator를 설치할 때 살짝 헤매기도 했지만 욕심내니까 진도가 너무 더뎠다 😢)*  
+# 욕심으로 시작한 실습 도전기!😅
 
-Prometheus Operator 설치에는 세 가지 방법이 있는데
+~~최근에 HPA 설정에 관해 작업하고 있었고, cpu나 memory 리소스 대신 다른 자원을 metric으로 수집하지 못할까 궁금했다. 그러던 중에 **Promethues**를 **Custom Resource**로 생성할 수 있다는 사실을 알고 흥미를 갖고 있었다.~~  
+  
+~~마침 타이밍이 딱 좋게 스터디에서도 Custom Resource가 언급되었고 바로 <u>Database와 Prometheus를 결합</u>한 실습을 해야겠다 생각했다.~~  
+  
+이번 포스팅에서 `MySQL Operator`, `InnoDB Cluster`, `Prometheus Operator`를 설치부터 해 볼 것이다.  
+*(사실 Prometheus Operator를 설치할 때 살짝 헤매기도 했지만 욕심내니까 실습 진도가 너무 더뎠다 😢)*  
+
 # Prerequisites
 
-먼저 AWS에서 가시다님이 제공해 주신 CloudFormation 템플릿으로 바닐라 쿠버네티스 클러스터를 생성해서 진행했다.
+먼저 가시다님이 제공해 주신 CloudFormation 템플릿으로 AWS에서 바닐라 쿠버네티스 클러스터를 생성해서 진행했다. **(항상 좋은 자료 감사합니다😆)**
 
-이전 포스팅 참고 : https://gain-yoo.github.io/database/DOIK-1%EC%B0%A8%EC%8B%9C-(1)/  
-
-*이전 포스팅과 스펙은 약간 다르다*
+이전 포스팅 참고 : [[Database/DOIK] AWS EC2에 Vanilla Kubernetes 실습 환경 배포](https://gain-yoo.github.io/database/DOIK-1%EC%B0%A8%EC%8B%9C-(1)/)
   
 > 본 실습에서 사용한 spec :
 >
-> OS : Ubuntu 22.04 LTS
-> Kubernetes : v1.23.7
-> Master 1개: AWS t3.large (2cpu, ram4G)
-> Node 3개: AWS t3.medium (2cpu, ram8G)
+> **OS** - Ubuntu 22.04 LTS  
+> **Kubernetes** - v1.23.7  
+> **Master 1개** - AWS t3.large (2cpu, ram4G)  
+> **Node 3개** - AWS t3.medium (2cpu, ram8G)  
 > 
 
+*위 포스팅과 스펙은 약간 다르다*
 
+## 실습하기 전에 MySQL & InnoDB에 대해 알고 가자 ☝
+### MySQL Operator
+
+https://blogs.oracle.com/content/published/api/v1.1/assets/CONTA498D59892324CD48C4594D6D016F8B1/Medium?cb=_cache_e162&format=jpg&channelToken=32954b2a813146c9b9a4fa99364eba8e  
+*그림 출처: [https://blogs.oracle.com/mysql/post/mysql-operator-for-kubernetes-reaches-general-availability](https://blogs.oracle.com/mysql/post/mysql-operator-for-kubernetes-reaches-general-availability)
+  
+- `MySQL Operator for Kubernetes` : MySQL InnoDB 클러스터 **관리나 자동화** 측면에서 편리하다.
+- `MySQL InnoDB Cluster` : InnoDB Cluster는 3개 이상의 MySQL Server 인스턴스로 구성되며 HA 기능을 제공한다.
+
+## 실습하기 전에 Prometheus Operator도 알고 가자 ✌
+Kubernetes에서 Prometheus를 사용하는 방법은 두 가지가 있다.
+- `Prometheus` : Prometheus Server를 직접 생성하는 방법
+- `Prometheus Operator` : Prometheus Operator를 이용하여 Prometheus Server를 생성하는 방법인데 **관리나 자동화** 측면에서 더 편리하다.
+	- <u>생성/삭제</u> : Prometheus Operator를 사용하여 Prometheus 인스턴스를 쉽게 실행하고 삭제할 수 있다.
+	- <u>단순 구성</u> : **Kubernetes의 리소스**를 이용하여 Prometheus 설정 구성이 가능하다.
+	- <u>Label을 통한 대상 서비스</u> : **Label Query**를 기반으로 모니터링 대상 구성을 자동으로 생성할 수 있다.
+  
+위와 같이 Prometheus Operator을 사용하는 이유를 알 수 있었다.
+
+https://sysdig.com/wp-content/uploads/2018/09/prometheus_operator_servicemonitor.png  
+*그림 출처 : [https://sysdig.com/blog/kubernetes-monitoring-prometheus-operator-part3/](https://sysdig.com/blog/kubernetes-monitoring-prometheus-operator-part3/)*
+  
+위 그림처럼 `Prometheus` 인스턴스와 `ServiceMonitor`은 동일한 네임스페이스에 설치되어 있어야 한다.
+
+### (1) 설치 버전
+Prometheus Operator 버전 `0.39.0` 이상은 Kubernetes 버전 `1.16.0` 이상이어야 한다.  
+Prometheus Operator를 처음 사용하는 경우 **최신 버전**을 사용하는 것이 좋으며, 이전 버전인 경우 <u>Kubernetes를 먼저 업그레이드하고</u> Prometheus Operator를 업그레이드할 것을 권장한다.
+
+### (2) 설치 방법
+Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
+
+1. **Prometheus Operator**
+	- <u>Prometheus</u>, <u>Alertmanager</u> 및 관련 모니터링 구성 요소를 포함하여 Custom Resource로 배포한다.
+	-  현재는 `prometheus-operator/prometheus-operator`라는 repository를 사용 중이지만 과거에는 `coreos/prometheus-operator`라는 repository를 사용하였다.
+2. **kube-prometheus**
+	- <u>Prometheus</u>, <u>Prometheus Operator</u>, <u>Alertmanager</u>, <u>node_exporter</u>, <u>Prometheus Adapter</u>, <u>kube-state-metrics</u>, <u>Grafana</u>를 포함해 설치한다.
+3. **community helm chart**
+	- <u>kube-prometheus와 비슷한 기능</u>을 제공하며 Prometheus 커뮤니티에서 관리하고 있다.
+	- 현재는 `prometheus-community/kube-prometheus-stack helm`라는 repository를 사용 중이지만 과거에는 `stable/prometheus-operator`라는 repository를 사용하였다.
+  
+<br>
+
+나는 1, 2번 둘다 설치해 봤는데 1번은 [약간의 트러블슈팅](https://gain-yoo.github.io/trouble%20shooting/custom-resource-error/)이 필요하여 따로 블로깅해 두었다.  
+그리고 나같은 경우에는 구글링의 도움을 받으며 설치하다 보니 각각 사이트마다 설치하는 repository 명이 달라 좀 더 헤맨 감이 있었다.  
+<u>설치 repository가 이전되면서 명칭이 달라진</u> 거였던 사소한 원인 ㅠㅠ...
 
 ## MySQL Operator 설치 with Helm
 
@@ -544,8 +589,6 @@ Prometheus Operator 설치에는 세 가지 방법이 있는데
 
 ## MySQL에 과부하줘서 3번에 설정한 HPA로 자동 scaling
 
-# 참고문헌
+# 참고 링크
 
 [MySQL :: MySQL Operator for Kubernetes Manual :: 3.1 Deploy using Helm](https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-innodbcluster-simple-helm.html)
-
-[core_kubernetes/chapters/16 at master · bjpublic/core_kubernetes](https://github.com/bjpublic/core_kubernetes/tree/master/chapters/16)
