@@ -42,7 +42,7 @@ sidebar:
 ### MySQL Operator
 
 ![Medium](https://user-images.githubusercontent.com/100563973/173386387-e7568bb2-0eb0-415e-872e-63fa4f2042b9.jpg)  
-*그림 출처: [https://blogs.oracle.com/mysql/post/mysql-operator-for-kubernetes-reaches-general-availability](https://blogs.oracle.com/mysql/post/mysql-operator-for-kubernetes-reaches-general-availability)
+*그림 출처: [https://blogs.oracle.com/mysql/post/mysql-operator-for-kubernetes-reaches-general-availability](https://blogs.oracle.com/mysql/post/mysql-operator-for-kubernetes-reaches-general-availability)*
   
 - `MySQL Operator for Kubernetes` : MySQL InnoDB 클러스터 **관리나 자동화** 측면에서 편리하다.
 - `MySQL InnoDB Cluster` : InnoDB Cluster는 3개 이상의 MySQL Server 인스턴스로 구성되며 HA 기능을 제공한다.
@@ -57,7 +57,7 @@ Kubernetes에서 Prometheus를 사용하는 방법은 두 가지가 있다.
   
 위와 같이 Prometheus Operator을 사용하는 이유를 알 수 있었다.
 
-![prometheus_operator_servicemonitor](https://user-images.githubusercontent.com/100563973/173386686-fa3be8bd-4ae4-44c6-9393-e47f70fc1693.png)  
+![prometheus_operator_servicemonitor](https://user-images.githubusercontent.com/100563973/173386686-fa3be8bd-4ae4-44c6-9393-e47f70fc1693.png)
 *그림 출처 : [https://sysdig.com/blog/kubernetes-monitoring-prometheus-operator-part3/](https://sysdig.com/blog/kubernetes-monitoring-prometheus-operator-part3/)*
   
 위 그림처럼 `Prometheus` 인스턴스와 `ServiceMonitor`은 동일한 네임스페이스에 설치되어 있어야 한다.
@@ -86,7 +86,7 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
 
 ## MySQL Operator 설치 with Helm
 
-1. repo 추가 및 설치
+1. repo 추가 및 확인
     
     ```java
     (🍉 |kubernetes-admin@kubernetes:default) root@k8s-m:~# helm repo add mysql-operator https://mysql.github.io/mysql-operator/
@@ -111,7 +111,9 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     	    imagesPullPolicy: IfNotPresent
     	    imagesDefaultRegistry:
     	    imagesDefaultRepository:
-    
+    ```
+2. 네임스페이스를 생성한 곳에 MySQL Operator를 설치
+	```java
     (🍉 |kubernetes-admin@kubernetes:default) root@k8s-m:~# helm install mysql-operator mysql-operator/mysql-operator --namespace mysql-operator --create-namespace --version 2.0.4
     	NAME: mysql-operator
     	LAST DEPLOYED: Mon Jun  6 21:12:43 2022
@@ -125,7 +127,7 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     	2. When using Helm repos :  `helm install [cluster-name] -n [ns-name] mysql-innodbcluster`
     ```
     
-2. 설치 확인
+3. 설치 확인
     
     ```java
     (🍉 |DOIK-Lab:default) root@k8s-m:~# kubectl get deploy,pod -n mysql-operator
@@ -145,7 +147,7 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     	mysqlbackups.mysql.oracle.com     2022-06-06T12:12:40Z
     ```
     
-3. 삭제
+4. 삭제
     
     ```java
     (🍉 |kubernetes-admin@kubernetes:default) root@k8s-m:~# helm uninstall mysql-operator -n mysql-operator && kubectl delete ns mysql-operator
@@ -156,10 +158,10 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
 
 ### **MySQL InnoDB Cluster** 설치 with Helm
 
-1. 설치
+1. `tls.useSelfSigned` 사용, root 패스워드 지정, 네임스페이스를 생성한 곳에 MySQL InnoDB를 설치
     
     ```java
-    (🍉 |kubernetes-admin@kubernetes:default) root@k8s-m:~# helm install mycluster mysql-operator/mysql-innodbcluster --set credentials.root.password='sakila' --set tls.useSelfSigned=true --namespace mysql-cluster --create-namespace --version 2.0.4
+    (🍉 |kubernetes-admin@kubernetes:default) root@k8s-m:~# helm install mycluster mysql-operator/mysql-innodbcluster --set credentials.root.password='사용자 설정' --set tls.useSelfSigned=true --namespace mysql-cluster --create-namespace --version 2.0.4
     	NAME: mycluster
     	LAST DEPLOYED: Mon Jun  6 21:16:49 2022
     	NAMESPACE: mysql-cluster
@@ -167,7 +169,6 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     	REVISION: 1
     	TEST SUITE: None
     ```
-    
 2. 설치 확인
     
     ```java
@@ -176,7 +177,7 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     	USER-SUPPLIED VALUES:
     	credentials:
     	  root:
-    	    password: sakila
+    	    password: 
     	tls:
     	  useSelfSigned: true
     (🍉 |kubernetes-admin@kubernetes:default) root@k8s-m:~# kubectl get innodbcluster,sts,pod,pv,pvc,svc,pdb,all -n mysql-cluster
