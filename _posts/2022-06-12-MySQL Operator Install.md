@@ -41,7 +41,7 @@ sidebar:
 ## 실습하기 전에 MySQL & InnoDB에 대해 알고 가자 ☝
 ### MySQL Operator
 
-https://blogs.oracle.com/content/published/api/v1.1/assets/CONTA498D59892324CD48C4594D6D016F8B1/Medium?cb=_cache_e162&format=jpg&channelToken=32954b2a813146c9b9a4fa99364eba8e  
+![Medium](https://user-images.githubusercontent.com/100563973/173386387-e7568bb2-0eb0-415e-872e-63fa4f2042b9.jpg)  
 *그림 출처: [https://blogs.oracle.com/mysql/post/mysql-operator-for-kubernetes-reaches-general-availability](https://blogs.oracle.com/mysql/post/mysql-operator-for-kubernetes-reaches-general-availability)
   
 - `MySQL Operator for Kubernetes` : MySQL InnoDB 클러스터 **관리나 자동화** 측면에서 편리하다.
@@ -57,7 +57,7 @@ Kubernetes에서 Prometheus를 사용하는 방법은 두 가지가 있다.
   
 위와 같이 Prometheus Operator을 사용하는 이유를 알 수 있었다.
 
-https://sysdig.com/wp-content/uploads/2018/09/prometheus_operator_servicemonitor.png  
+![prometheus_operator_servicemonitor](https://user-images.githubusercontent.com/100563973/173386686-fa3be8bd-4ae4-44c6-9393-e47f70fc1693.png)  
 *그림 출처 : [https://sysdig.com/blog/kubernetes-monitoring-prometheus-operator-part3/](https://sysdig.com/blog/kubernetes-monitoring-prometheus-operator-part3/)*
   
 위 그림처럼 `Prometheus` 인스턴스와 `ServiceMonitor`은 동일한 네임스페이스에 설치되어 있어야 한다.
@@ -560,7 +560,7 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     	grafana   NodePort   10.200.1.52   <none>        3000:30191/TCP   43m
     ```
     
-    ![Untitled](Prometheus%20Custom%20Resource%20%E1%84%89%E1%85%A2%E1%86%BC%E1%84%89%E1%85%A5%E1%86%BC%E1%84%92%E1%85%A1%E1%84%80%E1%85%B5%204e24cbd58f5a442ca897c4dccc71d10b/Untitled.png)
+    ![Untitled](https://user-images.githubusercontent.com/100563973/173387955-ee43260a-7f0f-4786-8ce2-b5a35346439b.png)
     
     ```java
     (🍉 |DOIK-Lab:default) root@k8s-m:~/kube-prometheus# k get svc -n monitoring prometheus-k8s
@@ -576,8 +576,8 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     	prometheus-k8s   NodePort   10.200.1.151   <none>        9090:32704/TCP,8080:32519/TCP   63m
     ```
     
-    ![Untitled](Prometheus%20Custom%20Resource%20%E1%84%89%E1%85%A2%E1%86%BC%E1%84%89%E1%85%A5%E1%86%BC%E1%84%92%E1%85%A1%E1%84%80%E1%85%B5%204e24cbd58f5a442ca897c4dccc71d10b/Untitled%201.png)
-    
+    ![Untitled (1)](https://user-images.githubusercontent.com/100563973/173388065-4d6303cf-6e56-4aae-8b3d-c9507d0e2973.png)
+
 
 ### Create Deployment, service, Service-Monitor, and HPA itself for testing
 
