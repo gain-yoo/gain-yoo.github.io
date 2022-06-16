@@ -82,7 +82,7 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
 
 나는 1, 2번 둘다 설치해 봤는데 1번은 [약간의 트러블슈팅](https://gain-yoo.github.io/trouble%20shooting/custom-resource-error/)이 필요하여 따로 블로깅해 두었다.  
 그리고 나같은 경우에는 구글링의 도움을 받으며 설치하다 보니 각각 사이트마다 설치하는 repository 명이 달라 좀 더 헤맨 감이 있었다.  
-<u>설치 repository가 이전되면서 명칭이 달라진</u> 거였던 사소한 원인 ㅠㅠ...
+<u>설치 repository가 이전되면서 명칭이 달라진 거</u>였던 사소한 원인 ㅠㅠ...
 
 ## MySQL Operator 설치 with Helm
 
