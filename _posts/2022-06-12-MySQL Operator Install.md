@@ -289,137 +289,15 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
 
 ## Prometheus Operator 생성
 
-운영자는 다음 [사용자 지정 리소스 정의(CRD)](https://github.com/coreos/prometheus-operator/blob/master/README.md#customresourcedefinitions) 에서 작동합니다 .
-
-- **원하는 Prometheus**
-    
-    배포를 정의하는 Prometheus. 운영자는 리소스 정의와 일치하는 배포가 실행되고 있는지 항상 확인합니다.
-    
-- **ServiceMonitor**
-    
-    , 서비스 그룹을 모니터링하는 방법을 선언적으로 지정합니다. 운영자는 정의를 기반으로 Prometheus 스크랩 구성을 자동으로 생성합니다.
-    
-- **Prometheus**
-    
-    경고 및 기록 규칙을 포함하는 Prometheus 인스턴스에서 로드할 수 있는 원하는 Prometheus 규칙 파일을 정의하는 PrometheusRule .
-    
-- **원하는 Alertmanager**
-    
-    배포를 정의하는 Alertmanager. 운영자는 리
-    
-
 ### Install Prometheus Operator
 
-```java
-(🍉 |DOIK-Lab:default) root@k8s-m:~# git clone https://github.com/prometheus-operator/kube-prometheus.git
-	Cloning into 'kube-prometheus'...
-	remote: Enumerating objects: 16271, done.
-	remote: Counting objects: 100% (192/192), done.
-	remote: Compressing objects: 100% (101/101), done.
-	remote: Total 16271 (delta 126), reused 128 (delta 84), pack-reused 16079
-	Receiving objects: 100% (16271/16271), 8.17 MiB | 11.57 MiB/s, done.
-	Resolving deltas: 100% (10456/10456), done.
-(🍉 |DOIK-Lab:default) root@k8s-m:~# git clone https://github.com/mateobur/prometheus-monitoring-guide.git
-	Cloning into 'prometheus-monitoring-guide'...
-	remote: Enumerating objects: 58, done.
-	remote: Total 58 (delta 0), reused 0 (delta 0), pack-reused 58
-		Receiving objects: 100% (58/58), 11.29cd po KiB | 1.88 MiB/s, done.
-	Resolving deltas: 100% (18/18), done.
-(🍉 |DOIK-Lab:default) root@k8s-m:~# kubectl create namespace monitoring
-	namespace/monitoring created
-```
-
-```java
-(🍉 |DOIK-Lab:default) root@k8s-m:~# kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
-	customresourcedefinition.apiextensions.k8s.io/alertmanagerconfigs.monitoring.coreos.com created
-	customresourcedefinition.apiextensions.k8s.io/alertmanagers.monitoring.coreos.com created
-	customresourcedefinition.apiextensions.k8s.io/podmonitors.monitoring.coreos.com created
-	customresourcedefinition.apiextensions.k8s.io/probes.monitoring.coreos.com created
-	customresourcedefinition.apiextensions.k8s.io/prometheusrules.monitoring.coreos.com created
-	customresourcedefinition.apiextensions.k8s.io/servicemonitors.monitoring.coreos.com created
-	customresourcedefinition.apiextensions.k8s.io/thanosrulers.monitoring.coreos.com created
-	clusterrolebinding.rbac.authorization.k8s.io/prometheus-operator created
-	clusterrole.rbac.authorization.k8s.io/prometheus-operator created
-	deployment.apps/prometheus-operator created
-	serviceaccount/prometheus-operator created
-	service/prometheus-operator created
-	The CustomResourceDefinition "prometheuses.monitoring.coreos.com" is invalid: metadata.annotations: Too long: must have at most 262144 bytes
-//(🍉 |DOIK-Lab:default) root@k8s-m:~# kubectl apply -f kube-prometheus/manifests/
-(🍉 |DOIK-Lab:default) root@k8s-m:~# kubectl replace -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml --force
-	customresourcedefinition.apiextensions.k8s.io "alertmanagerconfigs.monitoring.coreos.com" deleted
-	customresourcedefinition.apiextensions.k8s.io "alertmanagers.monitoring.coreos.com" deleted
-	customresourcedefinition.apiextensions.k8s.io "podmonitors.monitoring.coreos.com" deleted
-	customresourcedefinition.apiextensions.k8s.io "probes.monitoring.coreos.com" deleted
-	customresourcedefinition.apiextensions.k8s.io "prometheusrules.monitoring.coreos.com" deleted
-	customresourcedefinition.apiextensions.k8s.io "servicemonitors.monitoring.coreos.com" deleted
-	customresourcedefinition.apiextensions.k8s.io "thanosrulers.monitoring.coreos.com" deleted
-	clusterrolebinding.rbac.authorization.k8s.io "prometheus-operator" deleted
-	clusterrole.rbac.authorization.k8s.io "prometheus-operator" deleted
-	deployment.apps "prometheus-operator" deleted
-	serviceaccount "prometheus-operator" deleted
-	service "prometheus-operator" deleted
-	customresourcedefinition.apiextensions.k8s.io/alertmanagerconfigs.monitoring.coreos.com replaced
-	customresourcedefinition.apiextensions.k8s.io/alertmanagers.monitoring.coreos.com replaced
-	customresourcedefinition.apiextensions.k8s.io/podmonitors.monitoring.coreos.com replaced
-	customresourcedefinition.apiextensions.k8s.io/probes.monitoring.coreos.com replaced
-	customresourcedefinition.apiextensions.k8s.io/prometheuses.monitoring.coreos.com replaced
-	customresourcedefinition.apiextensions.k8s.io/prometheusrules.monitoring.coreos.com replaced
-	customresourcedefinition.apiextensions.k8s.io/servicemonitors.monitoring.coreos.com replaced
-	customresourcedefinition.apiextensions.k8s.io/thanosrulers.monitoring.coreos.com replaced
-	clusterrolebinding.rbac.authorization.k8s.io/prometheus-operator replaced
-	clusterrole.rbac.authorization.k8s.io/prometheus-operator replaced
-	deployment.apps/prometheus-operator replaced
-	serviceaccount/prometheus-operator replaced
-	service/prometheus-operator replaced
-```
+prometheus operator를 설치하다가 오류가 나서 아래 링크와 같이 트러블슈팅을 진행했다.  
 
 [[Kubernetes] Custom Resource Definition Install Error](https://gain-yoo.github.io/trouble%20shooting/custom-resource-error/)
+  
+`prometheus operator`로 설치하거나 `kube-prometheus`로 설치하거나 결과는 같아서 `kube-prometheus`로 진행할 것이다!
 
-리소스 확인
-
-```java
-(🍉 |DOIK-Lab:default) root@k8s-m:~# k get all -n monitoring 
-	NAME                                      READY   STATUS    RESTARTS        AGE
-	pod/blackbox-exporter-746c64fd88-t7mwl    3/3     Running   0               54m
-	pod/grafana-55f8bc6d97-5s5b8              1/1     Running   0               54m
-	pod/kube-state-metrics-6c8846558c-dr5jd   3/3     Running   0               54m
-	pod/node-exporter-77xm4                   2/2     Running   0               54m
-	pod/node-exporter-lgdqz                   2/2     Running   0               54m
-	pod/node-exporter-mrwz8                   2/2     Running   0               54m
-	pod/node-exporter-tnmxw                   2/2     Running   0               54m
-	pod/prometheus-adapter-6455646bdc-9nwzj   1/1     Running   0               54m
-	pod/prometheus-adapter-6455646bdc-mz9z9   1/1     Running   0               54m
-	pod/prometheus-operator-f59c8b954-2fzhv   2/2     Running   5 (4m39s ago)   54m
-	
-	NAME                          TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)              AGE
-	service/alertmanager-main     ClusterIP   10.200.1.20    <none>        9093/TCP,8080/TCP    55m
-	service/blackbox-exporter     ClusterIP   10.200.1.83    <none>        9115/TCP,19115/TCP   54m
-	service/grafana               ClusterIP   10.200.1.128   <none>        3000/TCP             54m
-	service/kube-state-metrics    ClusterIP   None           <none>        8443/TCP,9443/TCP    54m
-	service/node-exporter         ClusterIP   None           <none>        9100/TCP             54m
-	service/prometheus-adapter    ClusterIP   10.200.1.197   <none>        443/TCP              54m
-	service/prometheus-k8s        ClusterIP   10.200.1.145   <none>        9090/TCP,8080/TCP    54m
-	service/prometheus-operator   ClusterIP   None           <none>        8443/TCP             54m
-	
-	NAME                           DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
-	daemonset.apps/node-exporter   4         4         4       4            4           kubernetes.io/os=linux   54m
-	
-	NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
-	deployment.apps/blackbox-exporter     1/1     1            1           54m
-	deployment.apps/grafana               1/1     1            1           54m
-	deployment.apps/kube-state-metrics    1/1     1            1           54m
-	deployment.apps/prometheus-adapter    2/2     2            2           54m
-	deployment.apps/prometheus-operator   1/1     1            1           54m
-	
-	NAME                                            DESIRED   CURRENT   READY   AGE
-	replicaset.apps/blackbox-exporter-746c64fd88    1         1         1       54m
-	replicaset.apps/grafana-55f8bc6d97              1         1         1       54m
-	replicaset.apps/kube-state-metrics-6c8846558c   1         1         1       54m
-	replicaset.apps/prometheus-adapter-6455646bdc   2         2         2       54m
-	replicaset.apps/prometheus-operator-f59c8b954   1         1         1       54m
-```
-
-### Install ****kube-prometheus****
+### Install kube-prometheus
 
 1. Clone kube-prometheus
     
@@ -547,7 +425,7 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     	main   0.24.0    3          39m
     ```
     
-6. 외부접속을 위해 svc 수정
+6. 외부접속을 위해 svc 수정하고 `promethues`와 `grafana` 접속 확인
     
     ```java
     (🍉 |DOIK-Lab:default) root@k8s-m:~/kube-prometheus# k get svc -n monitoring grafana       
@@ -579,18 +457,6 @@ Prometheus Operator 설치에는 아래 세 가지 방법이 있다.
     
     ![Untitled (1)](https://user-images.githubusercontent.com/100563973/173388065-4d6303cf-6e56-4aae-8b3d-c9507d0e2973.png)
 
-
-### Create Deployment, service, Service-Monitor, and HPA itself for testing
-
-```java
-(🚴|DOIK-Lab:default) root@k8s-m:~/kube-prometheus# vi servicemonitor.yaml
-(🚴|DOIK-Lab:default) root@k8s-m:~/kube-prometheus# k create -f servicemonitor.yaml -n mysql-cluster
-	servicemonitor.monitoring.coreos.com/mycluster-router created
-```
-
-## Prometheus로 수집한 리소스를 기준으로 HPA 설정
-
-## MySQL에 과부하줘서 3번에 설정한 HPA로 자동 scaling
 
 # 참고 링크
 
