@@ -414,7 +414,7 @@ prometheus operator를 설치하다가 오류가 나서 아래 링크와 같이 
     	thanosrulers.monitoring.coreos.com          2022-06-07T12:57:33Z
     ```
     
-5. crd 통해 확인
+5. crd를 통해 확인
     
     ```java
     (🍉 |DOIK-Lab:default) root@k8s-m:~/kube-prometheus# k get prometheus -n monitoring 
