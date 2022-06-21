@@ -20,7 +20,7 @@ sidebar:
 
 ### 에러 로그
 
-```jsx
+```java
 [kubelet-check] It seems like the kubelet isn't running or healthy.
 [kubelet-check] The HTTP call equal to 'curl -sSL http://localhost:10248/healthz' failed with error: Get "http://localhost:10248/healthz": dial tcp 127.0.0.1:10248: connect: connection refused.
 
@@ -51,7 +51,7 @@ To see the stack trace of this error execute with --v=5 or higher
 ### 원인 추적
 kubelet이 정상 작동하고 있지 않네요...  
   
-```jsx
+```java
 root@master-node1:~# systemctl status kubelet
 	● kubelet.service - kubelet: The Kubernetes Node Agent
 	   Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enable
@@ -74,7 +74,7 @@ root@master-node1:~# docker logs CONTAINERID
 	- 따라서 cgroup 드라이버는 systemd로 일치시켜야 하며 그렇지 않을 시 kubelet 프로세스는 실패하게 됩니다.
 - `daemon.json` 파일 생성 → `kubeadm reset` → `kubeadm init`
     
-```jsx
+```java
 root@master-node1:~# cat > /etc/docker/daemon.json <<EOF
 	> {
 	>   "exec-opts": ["native.cgroupdriver=systemd"],
