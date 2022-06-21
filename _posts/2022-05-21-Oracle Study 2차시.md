@@ -53,7 +53,7 @@ sidebar:
     - **user** 본인 암호 변경할 때는 암호 규칙을 따라줘야 함
     - 하지만 **root**로 다른 user 암호 변경할 때는 암호 규칙 안따름
     
-    ```jsx
+    ```java
     [giyoo@study_gain ~]$ su
     	Password: 
     [root@study_gain giyoo]# passwd
@@ -95,7 +95,7 @@ sidebar:
 
 ## a. Unpack Files
 
-```jsx
+```java
 [root@study_gain abc]# ll
 	total 4
 	drwxr-xr-x. 8 root root 4096 Apr  2 13:47 database
@@ -116,7 +116,7 @@ sidebar:
 
 ## b. Hosts File
 
-```jsx
+```java
 [root@study_gain ~]# vi /etc/hosts
 	127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 	::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
@@ -139,7 +139,7 @@ sidebar:
 
 ### Automatic Setup
 
-```jsx
+```java
 [root@study_gain database]# yum install oracle-rdbms-server-11gR2-preinstall
 ```
 
@@ -149,7 +149,7 @@ sidebar:
 
 1. `/etc/sysctl.conf` 파일 수정
     
-    ```jsx
+    ```java
     [root@study_gain database]# vi /etc/sysctl.conf
     	fs.aio-max-nr = 1048576
     	fs.file-max = 6815744
@@ -194,7 +194,7 @@ sidebar:
     
 2. 패키지 설치
     
-    ```jsx
+    ```java
     yum install binutils -y
     yum install compat-libstdc++-33 -y
     yum install compat-libstdc++-33.i686 -y
@@ -237,7 +237,7 @@ sidebar:
     
 3. groups and users 추가
     
-    ```jsx
+    ```java
     [root@study_gain database]# groupadd -g 54321 oinstall
     [root@study_gain database]# groupadd -g 54322 dba
     [root@study_gain database]# groupadd -g 54323 oper
@@ -255,7 +255,7 @@ sidebar:
 
 1. oracle user 비밀번호 변경 및 SELINUX 설정
     
-    ```jsx
+    ```java
     [root@study_gain database]# passwd oracle
     	Changing password for user oracle.
     	New password: 
@@ -270,14 +270,14 @@ sidebar:
     
 2. oracle을 **database** 설치 파일넣고 **DATA**에는 데이터 디스크
     
-    ```jsx
+    ```java
     [root@study_gain database]# mkdir /oracle
     [root@study_gain database]# mkdir /DATA
     ```
     
 3. oracle 설치할 디렉토리 생성 및 권한 변경
     
-    ```jsx
+    ```java
     [root@study_gain database]# mkdir -p /oracle/app/oracle/product/11.2.0.4/db_1
     [root@study_gain ~]# chown -R oracle:oinstall /oracle
     [root@study_gain ~]# chmod -R 775 /oracle
@@ -292,14 +292,14 @@ sidebar:
     
 4. 콘솔에서 작업하거나 SSH 터널링을 사용하지 않는 경우 **root**로 로그인하고 **xhost** 명령어 실행
     
-    ```jsx
+    ```java
     [root@gain_study ~]$ xhost +
     	access control disabled, clients can connect from any host
     ```
     
     - **xhost error** 뜨면 아래와 같이 추가해 주기
         
-        ```jsx
+        ```java
         [oracle@study_gain ~]# env | grep DISPLAY
         [oracle@study_gain ~]# export DISPLAY=:0
         [oracle@study_gain ~]# env | grep DISPLAY
@@ -308,7 +308,7 @@ sidebar:
                 
 5. `/home/oracle/.bash_profile`에 Oracle 설정 값 추가
     
-    ```jsx
+    ```java
     [root@study_gain database]# vi /home/oracle/.bash_profile
     	# .bash_profile
     	
@@ -345,7 +345,7 @@ sidebar:
     - hostname = ygiora11g
 6. 환경변수 확인
     
-    ```jsx
+    ```java
     [giyoo@study_gain ~]$ su - oracle
     	Password: 
     [oracle@study_gain ~]$ env | grep ORACLE
@@ -359,7 +359,7 @@ sidebar:
     
 7. 소유 및 실행 권한 변경 후, **runInstaller** 실행
     
-    ```jsx
+    ```java
     [root@study_gain /]# chown -R oracle:oinstall /abc
     [root@study_gain /]# ll
     	total 32
@@ -367,7 +367,7 @@ sidebar:
     	drwxr-x--x.   3 oracle oinstall   21 Apr  2 13:46 abc
     ```
     
-    ```jsx
+    ```java
     [oracle@study_gain ~]$ cd /abc/
     [oracle@study_gain abc]$ ll
     	total 4
@@ -433,7 +433,7 @@ sidebar:
     
     ![Untitled 1](https://user-images.githubusercontent.com/100563973/169683585-7b606043-f8d3-4a7e-8fa4-bfe42d6786f3.png)
     
-    ```jsx
+    ```java
     [oracle@gain_study oraInventory]$ su -
     	Password: 
     	Last login: Fri Apr  8 19:20:20 EDT 2022 on pts/0
@@ -472,7 +472,7 @@ sidebar:
 ## a. 실행 중인 oracle 서버 확인
 - `ps -ef | grep ora_`
 
-    ```jsx
+    ```java
     [oracle@study_gain ~]$ ps -ef | grep ora_
     	oracle    2658     1  0 16:31 ?        00:00:00 ora_dbrm_DB11G
     	oracle    2660     1  0 16:31 ?        00:00:00 ora_psp0_DB11G
@@ -503,7 +503,7 @@ sidebar:
 - `select sysdate from dual;` : 현재 날짜 출력
                 
     
-    ```jsx
+    ```java
     [oracle@study_gain ~]$ sqlplus / as sysdba
     
     	SQL*Plus: Release 11.2.0.1.0 Production on Sat Apr 2 16:32:05 2022
@@ -552,7 +552,7 @@ sidebar:
     
 - 만약 DB가 내려가 있으면 `idle instance` 출력
     
-    ```jsx
+    ```java
     [oracle@study_gain ~]$ sqlplus / as sysdba
     	
     	SQL*Plus: Release 11.2.0.1.0 Production on Sat Apr 16 14:48:55 2022
