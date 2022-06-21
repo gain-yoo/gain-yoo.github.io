@@ -114,3 +114,36 @@ CRD는 하나빼고 다 생성완료!
 
 annotation이 없다는 경고 사항이 뜬다..!  
 추후 문제가 생긴다면 다시 트러블슈팅해야 겠다~
+
+---
+---
+### +) 내용 보강 ⇒ Server-Side Apply
+
+```java
+(🚴|DOIK-Lab:default) root@k8s-m:~# kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml --server-side
+	customresourcedefinition.apiextensions.k8s.io/alertmanagerconfigs.monitoring.coreos.com serverside-applied
+	customresourcedefinition.apiextensions.k8s.io/alertmanagers.monitoring.coreos.com serverside-applied
+	customresourcedefinition.apiextensions.k8s.io/podmonitors.monitoring.coreos.com serverside-applied
+	customresourcedefinition.apiextensions.k8s.io/probes.monitoring.coreos.com serverside-applied
+	customresourcedefinition.apiextensions.k8s.io/prometheuses.monitoring.coreos.com serverside-applied
+	customresourcedefinition.apiextensions.k8s.io/prometheusrules.monitoring.coreos.com serverside-applied
+	customresourcedefinition.apiextensions.k8s.io/servicemonitors.monitoring.coreos.com serverside-applied
+	customresourcedefinition.apiextensions.k8s.io/thanosrulers.monitoring.coreos.com serverside-applied
+	clusterrolebinding.rbac.authorization.k8s.io/prometheus-operator serverside-applied
+	clusterrole.rbac.authorization.k8s.io/prometheus-operator serverside-applied
+	deployment.apps/prometheus-operator serverside-applied
+	serviceaccount/prometheus-operator serverside-applied
+	service/prometheus-operator serverside-applied
+```
+
+*링크 참고 : [Server-Side Apply](https://kubernetes.io/docs/reference/using-api/server-side-apply/)*
+
+여러 사용자는 오브젝트 하나를 공유하며 사용할 수 있다. 오브젝트의 필드는 *field management*`(metadata.managedFields)` 메커니즘에 의해 관리되는데, 필드 값이 변경되면 *field manager*도 변경을 수행하려는 관리자로 바뀌게 된다.  
+
+이 때 `--server-side` 옵션을 사용하게 되면 `kubectl`에 의해 last-applied에서 관리하는 annotation을 비교하여 사용자의 필드 관리를 추적한다.  
+
+즉 `Server Side Apply`는 **선언적 설정을 통해** 사용자와 컨트롤러가 리소스를 관리할 수 있게 해준다.  
+  
+---
+
+`--force`이나 `--force-conflicts` 옵션으로 강제로 덮어씀으로써 필드 값을 변경할 수 있지만, 이는 **manageFields의 다른 모든 관리자 항목에서 필드가 제거된다고 하여** 리소스 손실의 위험이 있을 수 있으니 `Server Side Apply`를 활용하도록 하자!
