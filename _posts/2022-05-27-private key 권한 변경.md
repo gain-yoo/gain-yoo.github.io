@@ -13,7 +13,7 @@ sidebar:
 
 인스턴스에 접속하기 위해 ssh로 접근하는데 아래와 같은 에러 메세지가 떴다......whyrano whyrano......!!!!!
 
-```jsx
+```java
 gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ssh -i ./myk8s.pem ubuntu@13.125.127.182
 	The authenticity of host '13.125.127.182 (13.125.127.182)' can't be established.
 	ECDSA key fingerprint is SHA256:YQTjS5h0l/6FhEK7ApvX6vq9wbe88VG8JDQ9y95R3YM.
@@ -36,7 +36,7 @@ Private Key를 User 외 다른 모든 사람이 읽거나 쓸 수 있는 경우 
 
 참고 ) [인스턴스 연결 문제 해결](https://docs.aws.amazon.com/ko_kr/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#troubleshoot-unprotected-key)  
 
-```jsx
+```java
 gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ll myk8s.pem
 	-rwxrwxrwx 1 gain gain 1678 May 27 14:59 myk8s.pem*
 gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ chmod 400 myk8s.pem 
@@ -48,7 +48,7 @@ gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ll myk8s.pem
   
 *권한 변경하려니 **에러 속의 에러** 발생! 이번엔 wsl 관련 문제였다. [[WSL] WSL2에서 chmod 미작동 에러 (ubuntu 20.04.4 LTS)](https://gain-yoo.github.io/trouble%20shooting/wsl_chmod/) 포스팅 참고*
 
-```jsx
+```java
 gain@LAPTOP-NGE5O25S:/mnt/c/Users/User/Downloads$ ssh -i ./myk8s.pem ubuntu@13.125.127.182
 	Welcome to Ubuntu 22.04 LTS (GNU/Linux 5.15.0-1005-aws x86_64)
 	
