@@ -295,24 +295,17 @@ prometheus operator를 설치하다가 오류가 나서 아래 링크와 같이 
 
 [[Kubernetes] Custom Resource Definition Install Error](https://gain-yoo.github.io/trouble%20shooting/custom-resource-error/)
   
-`prometheus operator`로 설치하거나 `kube-prometheus`로 설치하거나 결과는 같아서 `kube-prometheus`로 진행할 것이다!
+`prometheus operator`로 설치하면 namespace가 default로 잡혀 있어서 `kube-prometheus`로 namespace는 monitoring에서 설치해 줄 것이다.
 
 ### Install kube-prometheus
 
 1. Clone kube-prometheus
     
     ```java
-    (🍉 |DOIK-Lab:default) root@k8s-m:~# git clone https://github.com/coreos/kube-prometheus.git
-    	Cloning into 'kube-prometheus'...
-    	remote: Enumerating objects: 16271, done.
-    	remote: Counting objects: 100% (192/192), done.
-    	remote: Compressing objects: 100% (104/104), done.
-    	remote: Total 16271 (delta 123), reused 128 (delta 81), pack-reused 16079
-    	Receiving objects: 100% (16271/16271), 8.17 MiB | 11.65 MiB/s, done.
-    	Resolving deltas: 100% (10463/10463), done.
+    (🍉 |DOIK-Lab:default) root@k8s-m:~# git clone https://github.com/prometheus-operator/kube-prometheus.git
     ```
     
-2. crd 생성
+2. setup으로 crd와 namespace monitoring을 생성한다.
     
     ```java
     (🍉 |DOIK-Lab:default) root@k8s-m:~# cd kube-prometheus/
@@ -326,13 +319,10 @@ prometheus operator를 설치하다가 오류가 나서 아래 링크와 같이 
     	namespace/monitoring created
     ```
     
-3. 리소스 생성
+3. 그외 리소스도 생성해 주는데 여기서는 apply 대신 create로 리소스를 생성해 줬더니 오류나지 않았다
     
     ```java
-    (🍉 |DOIK-Lab:default) root@k8s-m:~/kube-prometheus# until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
-    	No resources found
     (🍉 |DOIK-Lab:default) root@k8s-m:~/kube-prometheus# kubectl create -f manifests/
-    	//...생략...
     ```
     
 4. 리소스 확인
@@ -400,7 +390,7 @@ prometheus operator를 설치하다가 오류가 나서 아래 링크와 같이 
     ```
     
     ```java
-    (🍉 |DOIK-Lab:default) root@k8s-m:~/kube-prometheus# k get crd -n monitoring
+    (🍉 |DOIK-Lab:default) root@k8s-m:~/kube-prometheus# k get crd
     	NAME                                        CREATED AT
     	alertmanagerconfigs.monitoring.coreos.com   2022-06-07T12:57:32Z
     	alertmanagers.monitoring.coreos.com         2022-06-07T12:57:32Z
@@ -414,7 +404,7 @@ prometheus operator를 설치하다가 오류가 나서 아래 링크와 같이 
     	thanosrulers.monitoring.coreos.com          2022-06-07T12:57:33Z
     ```
     
-5. crd를 통해 확인
+5. crd 리소스 확인
     
     ```java
     (🍉 |DOIK-Lab:default) root@k8s-m:~/kube-prometheus# k get prometheus -n monitoring 
