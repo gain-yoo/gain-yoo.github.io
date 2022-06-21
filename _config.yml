@@ -23,7 +23,7 @@ name                     : "GAINS"
 description              : "개인개발자의 개발개인블루그"
 url                      : "https://gain-yoo.github.io/"
 baseurl                  : # the subpath of your site, e.g. "/blog"
-repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
+repository               : gain-yoo/gain-yoo.github.io # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : "/assets/images/snoopy2.jpg"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
