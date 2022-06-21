@@ -140,7 +140,7 @@ annotation이 없다는 경고 사항이 뜬다..!
 
 여러 사용자는 오브젝트 하나를 공유하며 사용할 수 있다. 오브젝트의 필드는 *field management*`(metadata.managedFields)` 메커니즘에 의해 관리되는데, 필드 값이 변경되면 *field manager*도 변경을 수행하려는 관리자로 바뀌게 된다.  
 
-이 때 `--server-side` 옵션을 사용하게 되면 `kubectl`에 의해 last-applied에서 관리하는 annotation을 비교하여 사용자의 필드 관리를 추적한다.  
+이 때 `--server-side` 옵션을 사용하게 되면 `kubectl`에 의해 last-applied에서 관리하는 annotation을 비교하여 <u>사용자의 필드 관리를 추적한다.</u>  
 
 즉 `Server Side Apply`는 **선언적 설정을 통해** 사용자와 컨트롤러가 리소스를 관리할 수 있게 해준다.  
   
