@@ -540,8 +540,10 @@ http_requests를 metric으로 잡고 mycluster를 hpa로 위와 같이 설정해
 ```
 그러나 http_requests이라는 metric을 찾을 수 없다는 에러 메시지를 뱉었다........  
   
-사진  
+![prometheus,hpa](https://user-images.githubusercontent.com/100563973/175080314-9f262c79-9efe-4e5a-ad76-6f74a7774b60.PNG)
+
 이쯤에서 흐름도를 설명해 보자면 그림과 같다.  
+  
 위에서 설치한 Prometheus Adapter는 HPA를 사용하기에 가장 필요한 리소스다.  
 Prometheus Adapter는 Prometheus Operator에 쿼리를 날린 후 Custom Metric 데이터를 가져와 API 서버에 제공하는 역할을 담당한다.  
 나는 우선 MySQL 서버에 쿼리를 날릴 것이다. 이 때 서버가 받는 requests가 기준치를 넘어갈 때 HPA로 MySQL 서버를 autoscaling해 줄 것이다. 근데 그러려면 **https_request 리소스가 Custom metric으로 등록되어야 한다.**  
