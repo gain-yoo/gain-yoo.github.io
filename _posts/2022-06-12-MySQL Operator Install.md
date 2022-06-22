@@ -547,6 +547,7 @@ http_requests를 metric으로 잡고 mycluster를 hpa로 위와 같이 설정해
 위에서 설치한 Prometheus Adapter는 HPA를 사용하기에 가장 필요한 리소스다.  
 Prometheus Adapter는 Prometheus Operator에 쿼리를 날린 후 Custom Metric 데이터를 가져와 API 서버에 제공하는 역할을 담당한다.  
 나는 우선 MySQL 서버에 쿼리를 날릴 것이다. 이 때 서버가 받는 requests가 기준치를 넘어갈 때 HPA로 MySQL 서버를 autoscaling해 줄 것이다. 근데 그러려면 **https_request 리소스가 Custom metric으로 등록되어야 한다.**  
+  
 이 것이 바로 지금 내가 흐름도를 설명하는 이유이다..😂
 
 ### +) Custom metric 등록하기★★
