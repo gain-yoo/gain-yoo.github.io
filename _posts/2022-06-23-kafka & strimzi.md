@@ -1,3 +1,16 @@
+---
+layout: single
+title: "[Database/Kubernetes/DOIK] Kafka & Strimzi  - HTTP Bridge as a Sidecar (1)"
+excerpt: "Kafka & Strimzi 설명 및 설치_작성중"
+categories:
+- Database
+tag: [DOIK, Kubernetes, 쿠버네티스, DevOps, AWS, CRD, CR, Custom Resource, 커스텀 리소스, Helm, Kafka, Strimzi, HTTP Bridge, Sidecar]
+toc: true
+author_profile: false
+sidebar:
+    nav: "docs"
+---
+
 # Kafka & Strimzi  - HTTP Bridge as a Sidecar
 
 # 1. Kafka & Strimzi Operator
@@ -82,13 +95,13 @@
 
 ### (2) 포트 9093에서 TLS 클라이언트 인증이 활성화되고 권한 부여도 활성화된 Kafka 클러스터를 배포
 
-1. kafka.yaml 확인 ⇒ 이름 변경하기
+1. kafka.yaml 확인 (3.1.2 버전 설치)
     
     ```java
-    (🚴|DOIK-Lab:default) root@k8s-m:~# cat ~/DOIK/3/kafka-1.yaml
+    (🚴|DOIK-Lab:default) root@k8s-m:~# cat kafka.yaml
     
     	───────┬───────────────────────────────────────────────────────────────────
-    	       │ File: /root/DOIK/3/kafka-1.yaml
+    	       │ File: kafka.yaml
     	───────┼───────────────────────────────────────────────────────────────────
     	   1   │ apiVersion: kafka.strimzi.io/v1beta2
     	   2   │ kind: Kafka
@@ -163,17 +176,31 @@
     
     <aside>
     💡 가시다님이 
-    ”배포 시 **requiredDuringSchedulingIgnoredDuringExecution** **지원** , ~~preferredDuringSchedulingIgnoredDuringExecution **미지원**~~...(상당한 삽질...)”
+    ”배포 시 <b>requiredDuringSchedulingIgnoredDuringExecution</b> <b>지원</b> , <s>preferredDuringSchedulingIgnoredDuringExecution <b>미지원</b></s>...(상당한 삽질...)”
     라고 하셔서 궁금해서 이 옵션 값에 대해 찾아 보았다.
     
     </aside>
-    
+	  
+    [같은 이슈를 가진 케이스가 있었다.](https://github.com/strimzi/strimzi-kafka-operator/issues/2280)  
+	  
+	좀 더 찾아 보니 아래 두 가지 글을 발견했다. 아래와 같은 이유로 `requiredDuringSchedulingIgnoredDuringExecution`를 사용하는 게 아닐까 조심스레 추측해 본다.  
+	  
+	> 2.7.1.1. Use pod anti-affinity to avoid critical applications sharing nodes
+	>  
+	> **Use pod anti-affinity to ensure that critical applications are never scheduled on the same disk.** When running a Kafka cluster, it is recommended to use pod **anti-affinity** to ensure that the Kafka brokers do not share nodes with other workloads, such as databases.  
+	  
+	> However, the `preferredDuringSchedulingIgnoredDuringExecution` rule does **not guarantee that the brokers will be spread.** Depending on your exact OpenShift and Kafka configurations, you should add additional affinity rules or configure topologySpreadConstraints for both ZooKeeper and Kafka to make sure the nodes are properly distributed accross as many racks as possible  
+	  
+	[링크 참고 1](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/assembly-deployment-configuration-str#con-scheduling-to-specific-nodes-str) [링크 참고 2](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/api_reference-str#property-listener-config-preferredNodePortAddressType-reference)  
+	  
     - **podAffinity & podAntiAffinity**
-        - `podAffinity`와 ****`podAntiAffinity`는 node의 레이블을 기반으로 하지 않고 **node에서 이미 실행 중인 pod 레이블을 기반으로** pod가 스케줄될 수 있는 **node를 제한**할 수 있다.
-        - `podAffinity`는 X가 규칙 Y를 충족하는 하나 이상의 pod를 이미 실행중인 경우 이 pod는 X에서 실행해야 한다. `podAntiAffinity`는 반대를 의미한다. *(여기서 X의 개념은 node, rack, cloud provider zone or region과 같은 topology domain을 말하고 Y는 namespace 리스트를 가진 LabelSelector이다.)*
+        - `podAffinity`와 `podAntiAffinity`는 node의 레이블을 기반으로 하지 않고 **node에서 이미 실행 중인 pod 레이블을 기반으로** pod가 스케줄될 수 있는 **node를 제한**할 수 있다.
+		- 즉 `podAffinity`는 동일한 label을 가진 pod가 **동일 영역에 스케줄링되게** 해 주는 설정 값이고 반대로 `podAntiAffinity`는 HA 구성할 때와 같이 동일한 label을 pod가 서로 다른 영역에 스케줄링되게 해 주는 설정 값이다.
+        - *위에서 말하는 영역은 node, rack, cloud provider zone or region과 같은 topology domain을 말하고 동일한 label을 가진 pod는 namespace 리스트를 가진 LabelSelector에 영향을 받는다.)*
     - **requiredDuringSchedulingIgnoredDuringExecution** & **preferredDuringSchedulingIgnoredDuringExecution**
-        - `requiredDuringSchedulingIgnoredDuringExecution`와  `preferredDuringSchedulingIgnoredDuringExecution`의 차이는 required와 preferred의 차이이다. `required`는 서로 많은 통신을 하기 때문에 **service A와 service B를 같은 영역에** 위치시키는 것이고 `preffered`는 pod가 더 많을 수 있기 때문에 **service를 여러 영역에 걸쳐 분배**하는 것이다.
-        - required(hard affinity) & preferred(soft affinity)는 반드시 포함해야 하는지 또는 우선시하되 필수는 아닌지를 결정하는 조건
+        - `requiredDuringSchedulingIgnoredDuringExecution`와  `preferredDuringSchedulingIgnoredDuringExecution`의 차이는 required와 preferred의 차이이다.
+        	- required(hard affinity) : 반드시 조건에 맞아야 해당 영역에만 배포됨
+			- preferred(soft affinity) : 되도록 조건에 맞는다면 해당 영역에 배포됨 (우선시하되 필수는 아니고 weight 옵션을 통해 우선순위 설정 가능)
         - 즉 위 매니페스트 파일에 의하면
         `kafka`는 `app.kubernetes.io/name=kafka`인 label을 가진 pod와 동일한 영역의 node에 스케줄되지 않는 것이고
         `zookeeper`는 `app.kubernetes.io/name=zookeeper`인 label을 가진 pod와 동일한 영역의 node에 스케줄되지 않는 것을 의미한다.
@@ -184,10 +211,10 @@
     
     [Kubernetes 특정 node에 pod 배포하기 - label, nodeSelector, affinity(nodeAffinity, podAffinity)](https://waspro.tistory.com/582)
     
-2. 클러스터 배포 ⇒ 이름 수정
+2. 클러스터 배포
     
     ```java
-    (🚴|DOIK-Lab:default) root@k8s-m:~# kubectl apply -f ~/DOIK/3/kafka-1.yaml -n kafka
+    (🚴|DOIK-Lab:default) root@k8s-m:~# kubectl apply -f kafka.yaml -n kafka
     	kafka.kafka.strimzi.io/my-cluster created
     ```
     
@@ -241,105 +268,7 @@
     	configmap/strimzi-cluster-operator                  1      5h52m
     ```
     
-### 생성
-    
-    ```java
-    (🚴|DOIK-Lab:default) root@k8s-m:~# kubectl get all,svc,ep,pvc,cm,secret -n kafka;echo;kubectl get pv
-    	NAME                                              READY   STATUS    RESTARTS        AGE
-    	pod/my-cluster-entity-operator-559b5d6d89-n8v7h   3/3     Running   0               15m
-    	pod/my-cluster-kafka-0                            1/1     Running   0               15m
-    	pod/my-cluster-kafka-1                            1/1     Running   0               15m
-    	pod/my-cluster-kafka-2                            1/1     Running   0               15m
-    	pod/my-cluster-zookeeper-0                        1/1     Running   0               17m
-    	pod/my-cluster-zookeeper-1                        1/1     Running   0               17m
-    	pod/my-cluster-zookeeper-2                        1/1     Running   0               17m
-    	pod/strimzi-cluster-operator-555b78d767-tzft6     1/1     Running   1 (5m16s ago)   29m
-    	
-    	NAME                                          TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)
-    	  AGE
-    	service/my-cluster-kafka-0                    NodePort    10.200.1.247   <none>        9094:31250/TCP
-    	  15m
-    	service/my-cluster-kafka-1                    NodePort    10.200.1.11    <none>        9094:32516/TCP
-    	  15m
-    	service/my-cluster-kafka-2                    NodePort    10.200.1.12    <none>        9094:30658/TCP
-    	  15m
-    	service/my-cluster-kafka-bootstrap            ClusterIP   10.200.1.133   <none>        9091/TCP,9092/TCP,9093/TCP
-    	  15m
-    	service/my-cluster-kafka-brokers              ClusterIP   None           <none>        9090/TCP,9091/TCP,9092/TCP,9093/TCP   15m
-    	service/my-cluster-kafka-external-bootstrap   NodePort    10.200.1.115   <none>        9094:31094/TCP
-    	  15m
-    	service/my-cluster-zookeeper-client           ClusterIP   10.200.1.35    <none>        2181/TCP
-    	  17m
-    	service/my-cluster-zookeeper-nodes            ClusterIP   None           <none>        2181/TCP,2888/TCP,3888/TCP
-    	  17m
-    	
-    	NAME                                         READY   UP-TO-DATE   AVAILABLE   AGE
-    	deployment.apps/my-cluster-entity-operator   1/1     1            1           15m
-    	deployment.apps/strimzi-cluster-operator     1/1     1            1           29m
-    	
-    	NAME                                                    DESIRED   CURRENT   READY   AGE
-    	replicaset.apps/my-cluster-entity-operator-559b5d6d89   1         1         1       15m
-    	replicaset.apps/strimzi-cluster-operator-555b78d767     1         1         1       29m
-    	
-    	NAME                                    READY   AGE
-    	statefulset.apps/my-cluster-kafka       3/3     15m
-    	statefulset.apps/my-cluster-zookeeper   3/3     17m
-    	
-    	NAME                                            ENDPOINTS                                                     AGE
-    	endpoints/my-cluster-kafka-0                    172.16.2.5:9094                                               15m
-    	endpoints/my-cluster-kafka-1                    172.16.3.5:9094                                               15m
-    	endpoints/my-cluster-kafka-2                    172.16.1.5:9094                                               15m
-    	endpoints/my-cluster-kafka-bootstrap            172.16.1.5:9093,172.16.2.5:9093,172.16.3.5:9093 + 6 more...   15m
-    	endpoints/my-cluster-kafka-brokers              172.16.1.5:9093,172.16.2.5:9093,172.16.3.5:9093 + 9 more...   15m
-    	endpoints/my-cluster-kafka-external-bootstrap   172.16.1.5:9094,172.16.2.5:9094,172.16.3.5:9094               15m
-    	endpoints/my-cluster-zookeeper-client           172.16.1.3:2181,172.16.2.3:2181,172.16.3.3:2181               17m
-    	endpoints/my-cluster-zookeeper-nodes            172.16.1.3:2888,172.16.2.3:2888,172.16.3.3:2888 + 6 more...   17m
-    	
-    	NAME                                                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-    	persistentvolumeclaim/data-0-my-cluster-kafka-0     Bound    pvc-1c1b9eb7-0f2c-4ddd-a69e-80b6ba4034e9   10Gi       RWO            local-path     15m
-    	persistentvolumeclaim/data-0-my-cluster-kafka-1     Bound    pvc-55a860e5-7c93-48c3-ae99-13f707c2bb26   10Gi       RWO            local-path     15m
-    	persistentvolumeclaim/data-0-my-cluster-kafka-2     Bound    pvc-ac45c198-6eb1-4399-b5a9-3abdf44d86d8   10Gi       RWO            local-path     15m
-    	persistentvolumeclaim/data-my-cluster-zookeeper-0   Bound    pvc-c6147628-aa85-43d0-a098-a5264f2d3878   10Gi       RWO            local-path     17m
-    	persistentvolumeclaim/data-my-cluster-zookeeper-1   Bound    pvc-797db27f-5a68-4073-9259-398aafd592fd   10Gi       RWO            local-path     17m
-    	persistentvolumeclaim/data-my-cluster-zookeeper-2   Bound    pvc-8a58314b-f493-4606-aec2-22b60e771daf   10Gi       RWO            local-path     17m
-    	
-    	NAME                                                DATA   AGE
-    	configmap/kube-root-ca.crt                          1      64m
-    	configmap/my-cluster-entity-topic-operator-config   1      15m
-    	configmap/my-cluster-entity-user-operator-config    1      15m
-    	configmap/my-cluster-kafka-config                   5      15m
-    	configmap/my-cluster-zookeeper-config               2      17m
-    	configmap/strimzi-cluster-operator                  1      29m
-    	
-    	NAME                                            TYPE                                  DATA   AGE
-    	secret/default-token-cjwg6                      kubernetes.io/service-account-token   3      64m
-    	secret/my-cluster-clients-ca                    Opaque                                1      17m
-    	secret/my-cluster-clients-ca-cert               Opaque                                3      17m
-    	secret/my-cluster-cluster-ca                    Opaque                                1      17m
-    	secret/my-cluster-cluster-ca-cert               Opaque                                3      17m
-    	secret/my-cluster-cluster-operator-certs        Opaque                                4      17m
-    	secret/my-cluster-entity-operator-token-rpbxt   kubernetes.io/service-account-token   3      15m
-    	secret/my-cluster-entity-topic-operator-certs   Opaque                                4      15m
-    	secret/my-cluster-entity-user-operator-certs    Opaque                                4      15m
-    	secret/my-cluster-kafka-brokers                 Opaque                                12     15m
-    	secret/my-cluster-kafka-token-cxntc             kubernetes.io/service-account-token   3      15m
-    	secret/my-cluster-zookeeper-nodes               Opaque                                12     17m
-    	secret/my-cluster-zookeeper-token-d99sh         kubernetes.io/service-account-token   3      17m
-    	secret/sh.helm.release.v1.kafka-operator.v1     helm.sh/release.v1                    1      29m
-    	secret/strimzi-cluster-operator-token-4dzgb     kubernetes.io/service-account-token   3      29m
-    	
-    	NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM
-    	        STORAGECLASS   REASON   AGE
-    	pvc-1c1b9eb7-0f2c-4ddd-a69e-80b6ba4034e9   10Gi       RWO            Delete           Bound    kafka/data-0-my-cluster-kafka-0     local-path              15m
-    	pvc-55a860e5-7c93-48c3-ae99-13f707c2bb26   10Gi       RWO            Delete           Bound    kafka/data-0-my-cluster-kafka-1     local-path              15m
-    	pvc-797db27f-5a68-4073-9259-398aafd592fd   10Gi       RWO            Delete           Bound    kafka/data-my-cluster-zookeeper-1   local-path              16m
-    	pvc-8a58314b-f493-4606-aec2-22b60e771daf   10Gi       RWO            Delete           Bound    kafka/data-my-cluster-zookeeper-2   local-path              16m
-    	pvc-ac45c198-6eb1-4399-b5a9-3abdf44d86d8   10Gi       RWO            Delete           Bound    kafka/data-0-my-cluster-kafka-2     local-path              15m
-    	pvc-c6147628-aa85-43d0-a098-a5264f2d3878   10Gi       RWO            Delete           Bound    kafka/data-my-cluster-zookeeper-0   local-path              16m
-    ```
-    
-
-# 2. ****HTTP Bridge를 Kubernetes 사이드카로 사용****
+# 2. HTTP Bridge를 Kubernetes 사이드카로 사용
 
 ## 1) 사이드카란?
 
