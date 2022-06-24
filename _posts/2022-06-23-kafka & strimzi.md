@@ -179,7 +179,7 @@ sidebar:
     ”배포 시 <b>requiredDuringSchedulingIgnoredDuringExecution</b> <b>지원</b> , <s>preferredDuringSchedulingIgnoredDuringExecution <b>미지원</b></s>...(상당한 삽질...)”
     라고 하셔서 궁금해서 이 옵션 값에 대해 찾아 보았다.
     
-    </aside>
+    </aside>  
 	  
     [같은 이슈를 가진 케이스가 있었다.](https://github.com/strimzi/strimzi-kafka-operator/issues/2280)  
 	  
@@ -206,9 +206,8 @@ sidebar:
         `zookeeper`는 `app.kubernetes.io/name=zookeeper`인 label을 가진 pod와 동일한 영역의 node에 스케줄되지 않는 것을 의미한다.
         - 참고로 두 옵션 값 외, **required**DuringScheduling**Required**DuringExecution & **preferred**DuringScheduling**Required**DuringExecution도 있다.
     - 결론 고 가용성을 위해
-    
-    [노드에 파드 할당하기](https://kubernetes.io/ko/docs/concepts/scheduling-eviction/assign-pod-node/#%ED%8C%8C%EB%93%9C%EA%B0%84-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0%EC%99%80-%EC%95%88%ED%8B%B0-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0)
-    
+      
+    [노드에 파드 할당하기](https://kubernetes.io/ko/docs/concepts/scheduling-eviction/assign-pod-node/#%ED%8C%8C%EB%93%9C%EA%B0%84-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0%EC%99%80-%EC%95%88%ED%8B%B0-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0)    
     [Kubernetes 특정 node에 pod 배포하기 - label, nodeSelector, affinity(nodeAffinity, podAffinity)](https://waspro.tistory.com/582)
     
 2. 클러스터 배포
