@@ -37,12 +37,15 @@ sidebar:
 ![스트림데이터기존데이터](https://user-images.githubusercontent.com/100563973/175553006-2bea4062-e9e2-4502-b7f3-81f20ba720ca.PNG)
 
 - **기존** 데이터 : 데이터 수집 → 처리 및 구조화 → 구축
-    📌 keypoint : 시간의 경과에 따라 **데이터 일괄 처리**
+
+    💡 keypoint : 시간의 경과에 따라 **데이터 일괄 처리**
     
 - **스트림** 데이터 : 실시간 이동 데이터의 이용/저장/보강/분석
-    📌 keypoint : **저장(Storage) & 처리(Processing)**
 
-*참고 링크 : [What is Streaming Data? How it Works, Examples, and Use Cases | KR](https://www.confluent.io/ko-kr/learn/data-streaming/)*  
+    💡 keypoint : **저장(Storage) & 처리(Processing)**
+
+
+*참고 링크 : [What is Streaming Data? How it Works, Examples, and Use Cases (KR)](https://www.confluent.io/ko-kr/learn/data-streaming/)*  
   
 
 ![이벤트스트림처리](https://user-images.githubusercontent.com/100563973/175553039-513d5edf-d3aa-4d6a-9b89-450c417b1624.PNG)
