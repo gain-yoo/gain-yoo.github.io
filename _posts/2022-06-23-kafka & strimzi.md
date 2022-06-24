@@ -58,6 +58,10 @@ sidebar:
 ## 2) Strimzi Operator란?
 - Strimzi 는 Kubernetes 환경에서 Kafka 운영 관리에 도움을 주는 Operator 다.
 
+![Untitled](https://user-images.githubusercontent.com/100563973/175555341-b9132848-024b-42fd-b554-e9d03d67b2e1.png)
+
+[Strimzi Overview guide (In Development)](https://strimzi.io/docs/operators/in-development/overview.html)
+
 ## 3) 브리지 사이드카로 애플리케이션을 배포하기 전에 준비
 
 ### (1) Strimzi Cluster Operator 설치
