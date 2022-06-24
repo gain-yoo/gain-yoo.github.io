@@ -19,10 +19,7 @@ sidebar:
 
 무슨 말인지???? 일단 아래부터 이해해 보자!
 
-<aside>
-❓ **메시지** 브로커 (RabbitMQ) vs **이벤트** 브로커 (Kafka) 차이?
-
-</aside>
+![메시지이벤트차이](https://user-images.githubusercontent.com/100563973/175552977-c4d9919b-c038-44d7-b80b-0fc80efe2283.PNG)
 
 - **메시지** 브로커 : 메시지 전송 → 처리 → 삭제
 - **이벤트** 브로커 : 메시지 브로커와 유사하지만, 삭제는 없이! 데이터 베이스에 저장하듯이 이벤트 브로커의 큐에 저장!
@@ -31,30 +28,24 @@ sidebar:
     - 장점👍
         1. 한번 일어난 이벤트 데이터를 브로커에 저장함으로 **단일 진실 공급원**(Single Source of Truth, SSOT)으로 사용 가능  
         <i>(* SSOT : 집약 데이터의 축척은 한곳에서 담당하고 데이터의 활용은 참조 형식으로 다수 사용하는 형태)</i>
+        ![2-after_kafka](https://user-images.githubusercontent.com/100563973/175553146-be017ad2-33b4-420b-b471-0c4eb4389d69.png)
         2. 장애 발생 시 **장애 발생 시점부터** 다시 처리 가능
         3. 많은 양의 **실시간 스트림 데이터**를 효과적으로 처리 가능
 
-*참고 영상 : [카프카, 레빗엠큐, 레디스 큐의 큰 차이점! 이벤트 브로커와 메시지 브로커에 대해 알아봅시다.](https://www.youtube.com/watch?v=H_DaPyUOeTo)*
-
-<aside>
-❓ **스트림** 데이터? 는 **기존** 데이터와 무엇이 다를까요?
-
-</aside>
+*참고 자료 영상 : [카프카, 레빗엠큐, 레디스 큐의 큰 차이점! 이벤트 브로커와 메시지 브로커에 대해 알아봅시다.](https://www.youtube.com/watch?v=H_DaPyUOeTo)*  
+  
+![스트림데이터기존데이터](https://user-images.githubusercontent.com/100563973/175553006-2bea4062-e9e2-4502-b7f3-81f20ba720ca.PNG)
 
 - **기존** 데이터 : 데이터 수집 → 처리 및 구조화 → 구축
-    
     📌 keypoint : 시간의 경과에 따라 **데이터 일괄 처리**
     
 - **스트림** 데이터 : 실시간 이동 데이터의 이용/저장/보강/분석
-    
     📌 keypoint : **저장(Storage) & 처리(Processing)**
 
-*참고 링크 : [What is Streaming Data? How it Works, Examples, and Use Cases | KR](https://www.confluent.io/ko-kr/learn/data-streaming/)*
+*참고 링크 : [What is Streaming Data? How it Works, Examples, and Use Cases | KR](https://www.confluent.io/ko-kr/learn/data-streaming/)*  
+  
 
-<aside>
-❓ **이벤트** 처리 vs **이벤트 스트림** 처리?
-
-</aside>
+![이벤트스트림처리](https://user-images.githubusercontent.com/100563973/175553039-513d5edf-d3aa-4d6a-9b89-450c417b1624.PNG)
 
 - **이벤트** 처리 : **시간별로** 정렬된 **개별 이벤트**를 한 번에 하나씩 확인
 - **이벤트 스트림** 처리 : **대량** 이벤트를 **실시간으로** 함께 처리
