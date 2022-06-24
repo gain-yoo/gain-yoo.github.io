@@ -191,7 +191,7 @@ sidebar:
 	  
 	> However, the `preferredDuringSchedulingIgnoredDuringExecution` rule does **not guarantee that the brokers will be spread.** Depending on your exact OpenShift and Kafka configurations, you should add additional affinity rules or configure topologySpreadConstraints for both ZooKeeper and Kafka to make sure the nodes are properly distributed accross as many racks as possible  
 	  
-	[링크 참고 1](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/assembly-deployment-configuration-str#con-scheduling-to-specific-nodes-str) [링크 참고 2](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/api_reference-str#property-listener-config-preferredNodePortAddressType-reference)  
+	[링크 참고 1](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/assembly-deployment-configuration-str#con-scheduling-to-specific-nodes-str)   [링크 참고 2](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/api_reference-str#property-listener-config-preferredNodePortAddressType-reference)  
 	  
     - **podAffinity & podAntiAffinity**
         - `podAffinity`와 `podAntiAffinity`는 node의 레이블을 기반으로 하지 않고 **node에서 이미 실행 중인 pod 레이블을 기반으로** pod가 스케줄될 수 있는 **node를 제한**할 수 있다.
