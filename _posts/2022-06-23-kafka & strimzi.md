@@ -1,7 +1,7 @@
 ---
 layout: single
-title: "[Database/Kubernetes/DOIK] Kafka & Strimzi  - HTTP Bridge as a Sidecar (1)"
-excerpt: "Kafka & Strimzi 설명 및 설치_작성중"
+title: "[Database/Kubernetes/DOIK] Kafka & Strimzi Operator - HTTP Bridge as a Sidecar (1)"
+excerpt: "Kafka & Strimzi Operator 설명 및 설치_작성중"
 categories:
 - Database
 tag: [DOIK, Kubernetes, 쿠버네티스, DevOps, AWS, CRD, CR, Custom Resource, 커스텀 리소스, Helm, Kafka, Strimzi, HTTP Bridge, Sidecar]
@@ -11,25 +11,58 @@ sidebar:
     nav: "docs"
 ---
 
-# Kafka & Strimzi  - HTTP Bridge as a Sidecar
-
 # 1. Kafka & Strimzi Operator
 
 ## 1) Kafka란?
 
-비동기식
+- 비동기식, 스트리밍 플랫폼, 데이터허브 느낌….
 
-스트리밍 플랫폼
+무슨 말인지???? 일단 아래부터 이해해 보자!
 
-데이터허브느낌
+<aside>
+❓ **메시지** 브로커 (RabbitMQ) vs **이벤트** 브로커 (Kafka) 차이?
 
-프로듀스, 컨슈머 용어 알기
+</aside>
 
-주키퍼는 카프카의 메타데이터 저장
+- **메시지** 브로커 : 메시지 전송 → 처리 → 삭제
+- **이벤트** 브로커 : 메시지 브로커와 유사하지만, 삭제는 없이! 데이터 베이스에 저장하듯이 이벤트 브로커의 큐에 저장!
+    - **이벤트** 하나만 보관하여 인덱스를 통해 개별 액세스 관리
+    - 필요한 시간 동안에는 이벤트 **보존** 가능
+    - 장점👍
+        1. 한번 일어난 이벤트 데이터를 브로커에 저장함으로 **단일 진실 공급원**(Single Source of Truth, SSOT)으로 사용 가능  
+        <i>(* SSOT : 집약 데이터의 축척은 한곳에서 담당하고 데이터의 활용은 참조 형식으로 다수 사용하는 형태)</i>
+        2. 장애 발생 시 **장애 발생 시점부터** 다시 처리 가능
+        3. 많은 양의 **실시간 스트림 데이터**를 효과적으로 처리 가능
 
-브로커가 mysql 서버와 동일한 역할
+*참고 영상 : [카프카, 레빗엠큐, 레디스 큐의 큰 차이점! 이벤트 브로커와 메시지 브로커에 대해 알아봅시다.](https://www.youtube.com/watch?v=H_DaPyUOeTo)*
+
+<aside>
+❓ **스트림** 데이터? 는 **기존** 데이터와 무엇이 다를까요?
+
+</aside>
+
+- **기존** 데이터 : 데이터 수집 → 처리 및 구조화 → 구축
+    
+    📌 keypoint : 시간의 경과에 따라 **데이터 일괄 처리**
+    
+- **스트림** 데이터 : 실시간 이동 데이터의 이용/저장/보강/분석
+    
+    📌 keypoint : **저장(Storage) & 처리(Processing)**
+
+*참고 링크 : [What is Streaming Data? How it Works, Examples, and Use Cases | KR](https://www.confluent.io/ko-kr/learn/data-streaming/)*
+
+<aside>
+❓ **이벤트** 처리 vs **이벤트 스트림** 처리?
+
+</aside>
+
+- **이벤트** 처리 : **시간별로** 정렬된 **개별 이벤트**를 한 번에 하나씩 확인
+- **이벤트 스트림** 처리 : **대량** 이벤트를 **실시간으로** 함께 처리
+
+*참고 링크 : [이벤트 스트림 처리란 무엇입니까?](https://www.tibco.com/ko/reference-center/what-is-event-stream-processing)*
 
 ## 2) Strimzi Operator란?
+- Strimzi 는 Kubernetes 환경에서 Kafka 운영 관리에 도움을 주는 Operator 다.
 
 ## 3) 브리지 사이드카로 애플리케이션을 배포하기 전에 준비
 
@@ -174,14 +207,9 @@ sidebar:
     	───────┴───────────────────────────────────────────────────────────────────
     ```
     
-    <aside>
-    💡 가시다님이 
-    ”배포 시 <b>requiredDuringSchedulingIgnoredDuringExecution</b> <b>지원</b> , <s>preferredDuringSchedulingIgnoredDuringExecution <b>미지원</b></s>...(상당한 삽질...)”
-    라고 하셔서 궁금해서 이 옵션 값에 대해 찾아 보았다.
-    
-    </aside>  
+    > ”배포 시 **requiredDuringSchedulingIgnoredDuringExecution 지원** , ~~preferredDuringSchedulingIgnoredDuringExecution **미지원**~~...(상당한 삽질...)”
 	  
-    [같은 이슈를 가진 케이스가 있었다.](https://github.com/strimzi/strimzi-kafka-operator/issues/2280)  
+	💡 가시다님이 위와 같이 말씀하신게 궁금해서 이 옵션 값에 대해 찾아 보았는데 [같은 이슈를 가진 케이스가 있었다.](https://github.com/strimzi/strimzi-kafka-operator/issues/2280)  
 	  
 	좀 더 찾아 보니 아래 두 가지 글을 발견했다. 아래와 같은 이유로 `requiredDuringSchedulingIgnoredDuringExecution`를 사용하는 게 아닐까 조심스레 추측해 본다.  
 	  
@@ -191,24 +219,19 @@ sidebar:
 	  
 	> However, the `preferredDuringSchedulingIgnoredDuringExecution` rule does **not guarantee that the brokers will be spread.** Depending on your exact OpenShift and Kafka configurations, you should add additional affinity rules or configure topologySpreadConstraints for both ZooKeeper and Kafka to make sure the nodes are properly distributed accross as many racks as possible  
 	  
-	[링크 참고 1](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/assembly-deployment-configuration-str#con-scheduling-to-specific-nodes-str)   [링크 참고 2](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/api_reference-str#property-listener-config-preferredNodePortAddressType-reference)  
+	[링크 참고 1](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/assembly-deployment-configuration-str#con-scheduling-to-specific-nodes-str)    [링크 참고 2](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.1/html/configuring_amq_streams_on_openshift/api_reference-str#property-listener-config-preferredNodePortAddressType-reference)  
 	  
-    - **podAffinity & podAntiAffinity**
-        - `podAffinity`와 `podAntiAffinity`는 node의 레이블을 기반으로 하지 않고 **node에서 이미 실행 중인 pod 레이블을 기반으로** pod가 스케줄될 수 있는 **node를 제한**할 수 있다.
-		- 즉 `podAffinity`는 동일한 label을 가진 pod가 **동일 영역에 스케줄링되게** 해 주는 설정 값이고 반대로 `podAntiAffinity`는 HA 구성할 때와 같이 동일한 label을 pod가 서로 다른 영역에 스케줄링되게 해 주는 설정 값이다.
-        - *위에서 말하는 영역은 node, rack, cloud provider zone or region과 같은 topology domain을 말하고 동일한 label을 가진 pod는 namespace 리스트를 가진 LabelSelector에 영향을 받는다.)*
-    - **requiredDuringSchedulingIgnoredDuringExecution** & **preferredDuringSchedulingIgnoredDuringExecution**
-        - `requiredDuringSchedulingIgnoredDuringExecution`와  `preferredDuringSchedulingIgnoredDuringExecution`의 차이는 required와 preferred의 차이이다.
-        	- required(hard affinity) : 반드시 조건에 맞아야 해당 영역에만 배포됨
-			- preferred(soft affinity) : 되도록 조건에 맞는다면 해당 영역에 배포됨 (우선시하되 필수는 아니고 weight 옵션을 통해 우선순위 설정 가능)
-        - 즉 위 매니페스트 파일에 의하면
-        `kafka`는 `app.kubernetes.io/name=kafka`인 label을 가진 pod와 동일한 영역의 node에 스케줄되지 않는 것이고
-        `zookeeper`는 `app.kubernetes.io/name=zookeeper`인 label을 가진 pod와 동일한 영역의 node에 스케줄되지 않는 것을 의미한다.
-        - 참고로 두 옵션 값 외, **required**DuringScheduling**Required**DuringExecution & **preferred**DuringScheduling**Required**DuringExecution도 있다.
-    - 결론 고 가용성을 위해
-      
-    [노드에 파드 할당하기](https://kubernetes.io/ko/docs/concepts/scheduling-eviction/assign-pod-node/#%ED%8C%8C%EB%93%9C%EA%B0%84-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0%EC%99%80-%EC%95%88%ED%8B%B0-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0)    
-    [Kubernetes 특정 node에 pod 배포하기 - label, nodeSelector, affinity(nodeAffinity, podAffinity)](https://waspro.tistory.com/582)
+    - podAffinity & pod**Anti**Affinity
+		- node에서 이미 실행 중인 pod 레이블을 기반으로 `podAffinity`는 <u>동일한 label을 가진 pod가 동일 영역에 스케줄링되게</u> 해 주는 설정 값이고 반대로 `podAntiAffinity`는 HA 구성할 때와 같이 <u>동일한 label을 pod가 서로 다른 영역에 스케줄링되게</u> 해 주는 설정 값이다.  
+        *(영역 : node, rack, cloud provider zone or region과 같은 topology domain)*  
+		*(pod : LabelSelector에 영향받음)*
+    - **required**DuringSchedulingIgnoredDuringExecution & **preferred**DuringSchedulingIgnoredDuringExecution
+		- required(hard affinity) : 반드시 조건에 맞아야 해당 영역에만 배포됨
+		- preferred(soft affinity) : 되도록 조건에 맞는다면 해당 영역에 배포됨 (우선시하되 필수는 아니고 weight 옵션을 통해 우선순위 설정 가능)
+        - 즉, 위 매니페스트 파일에 의하면
+        **`kafka` 또는 `zookeeper`는 *app.kubernetes.io/name=kafka* 또는 *app.kubernetes.io/name=zookeeper*인 조건 하나만 충족한다면 동일한 label의 pod끼리는 반드시 다른 node에 스케줄되어야 한다는 것을 의미한다.** ⇒ <u>고가용성</u>✨
+	  
+    *링크 참고 : [노드에 파드 할당하기](https://kubernetes.io/ko/docs/concepts/scheduling-eviction/assign-pod-node/#%ED%8C%8C%EB%93%9C%EA%B0%84-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0%EC%99%80-%EC%95%88%ED%8B%B0-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0)*    
     
 2. 클러스터 배포
     
@@ -267,16 +290,3 @@ sidebar:
     	configmap/strimzi-cluster-operator                  1      5h52m
     ```
     
-# 2. HTTP Bridge를 Kubernetes 사이드카로 사용
-
-## 1) 사이드카란?
-
-## 2) ****사이드카로서의 Strimzi HTTP 브리지****
-
-## 3) 실습 구성
-
-### (1) **브리지 구성**
-
-### (2) **사이드카 배포**
-
-### (3) **사이드카 사용**
