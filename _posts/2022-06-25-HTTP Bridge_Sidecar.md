@@ -29,7 +29,8 @@ sidebar:
 
 *그림 출처 : [Using HTTP Bridge as a Kubernetes sidecar](https://strimzi.io/blog/2021/08/18/using-http-bridge-as-a-kubernetes-sidecar/)*
 
-- 메인 애플리케이션이 kafka 클라이언트 지원이 어려울 경우, HTTP로 Bridge Sidecar Container 활용
+- 메인 애플리케이션이 kafka 클라이언트 지원이 어려울 경우, HTTP로 Bridge Sidecar Container 활용  
+	⇒ 그래서 Bridge Sidecar가 클라이언트 역할을 한다.
 - Pod 내 Container끼리 내부 통신하므로 Bridge의 HTTP 인터페이스 보안 걱정은 덜 수 있다.
 
 ## 3) Bridge Sidecar로 애플리케이션을 배포하기 전에 준비 실습
@@ -50,14 +51,15 @@ sidebar:
           - name: tls
             port: 9093
             type: internal
-            **tls: true**
-            **authentication:
+            tls: true
+            authentication:
               type: tls
         authorization:
-          type: simple**
+          type: simple
     ...생략...
     ```
-    kafka 클러스터를 구성할 때 `tls`는 false로 설정해서 **true**로 다시 설정했다.
+    kafka 클러스터를 구성할 때 `tls`는 false로 설정해서 **true**로 다시 설정했다.  
+	여기서는 edit으로 리소스를 수정했지만 추후 에러를 방지하기 위해 **삭제하고 재생성**하는 것을 권장한다!
 
 2. 정상 수정 확인
     
@@ -94,46 +96,47 @@ sidebar:
 1. bridge-user.yaml 내용 확인
     
     ```java
-    (🚴|DOIK-Lab:default) root@k8s-m:~# cat bridge-user.yaml
-    ───────┬─────────────────────────────────────────────────────────────────────────
-           │ File: /root/bridge-user.yaml
-    ───────┼─────────────────────────────────────────────────────────────────────────
-       1   │ apiVersion: kafka.strimzi.io/v1beta2
-       2   │ kind: KafkaUser
-       3   │ metadata:
-       4   │   name: bridge
-       5   │   labels:
-       6   │     strimzi.io/cluster: my-cluster
-       7   │ spec:
-       8   │   authentication:
-       9   │     type: tls
-      10   │   authorization:
-      11   │     type: simple
-      12   │     acls:
-      13   │       # Consume from topic my-topic using consumer group my-group
-      14   │       - resource:
-      15   │           type: topic
-      16   │           name: my-topic
-      17   │           patternType: literal
-      18   │         operation: Read
-      19   │         host: "*"
-      20   │       - resource:
-      21   │           type: group
-      22   │           name: my-group
-      23   │           patternType: literal
-      24   │         operation: Read
-      25   │         host: "*"
-      26   │       # Producer messages to topic my-topic
-      27   │       - resource:
-      28   │           type: topic
-      29   │           name: my-topic
-      30   │           patternType: literal
-      31   │         operation: Write
-      32   │         host: "*"
-    ───────┴─────────────────────────────────────────────────────────────────────────
+    (🚴|DOIK-Lab:default) root@k8s-m:~# cat ~/DOIK/3/bridge-user.yaml
+    	───────┬─────────────────────────────────────────────────────────────────────────
+    	       │ File: /root/DOIK/3/bridge-user.yaml
+    	───────┼─────────────────────────────────────────────────────────────────────────
+    	   1   │ apiVersion: kafka.strimzi.io/v1beta2
+    	   2   │ kind: KafkaUser
+    	   3   │ metadata:
+    	   4   │   name: bridge
+    	   5   │   labels:
+    	   6   │     strimzi.io/cluster: my-cluster
+    	   7   │ spec:
+    	   8   │   authentication:
+    	   9   │     type: tls
+    	  10   │   authorization:
+    	  11   │     type: simple
+    	  12   │     acls:
+    	  13   │       # Consume from topic my-topic using consumer group my-group
+    	  14   │       - resource:
+    	  15   │           type: topic
+    	  16   │           name: my-topic
+    	  17   │           patternType: literal
+    	  18   │         operation: Read
+    	  19   │         host: "*"
+    	  20   │       - resource:
+    	  21   │           type: group
+    	  22   │           name: my-group
+    	  23   │           patternType: literal
+    	  24   │         operation: Read
+    	  25   │         host: "*"
+    	  26   │       # Producer messages to topic my-topic
+    	  27   │       - resource:
+    	  28   │           type: topic
+    	  29   │           name: my-topic
+    	  30   │           patternType: literal
+    	  31   │         operation: Write
+    	  32   │         host: "*"
+    	───────┴─────────────────────────────────────────────────────────────────────────
     ```
-    `authentication.type: tls`로 TLS 클라이언트 인증을 구성하고 `acls`로 topic에서 읽기/쓰기 권한을 구성한다.
     
+    `authentication.type: tls`로 TLS 클라이언트 인증을 구성하고 `acls`로 topic에서 읽기/쓰기 권한을 구성한다.
+
 2. KafkaUser 생성 및 확인
     
     ```java
@@ -150,20 +153,20 @@ sidebar:
 1. bridge-topic.yaml 내용 확인
     
     ```java
-    (🚴|DOIK-Lab:default) root@k8s-m:~# cat bridge-topic.yaml
-    ───────┬────────────────────────────────────────────
-           │ File: /root/bridge-topic.yaml
-    ───────┼────────────────────────────────────────────
-       1   │ apiVersion: kafka.strimzi.io/v1beta2
-       2   │ kind: KafkaTopic
-       3   │ metadata:
-       4   │   name: my-topic
-       5   │   labels:
-       6   │     strimzi.io/cluster: my-cluster
-       7   │ spec:
-       8   │   partitions: 1
-       9   │   replicas: 1
-    ───────┴────────────────────────────────────────────
+    (🚴|DOIK-Lab:default) root@k8s-m:~# cat ~/DOIK/3/bridge-topic.yaml
+    	───────┬────────────────────────────────────────────
+    	       │ File: /root/DOIK/3/bridge-topic.yaml
+    	───────┼────────────────────────────────────────────
+    	   1   │ apiVersion: kafka.strimzi.io/v1beta2
+    	   2   │ kind: KafkaTopic
+    	   3   │ metadata:
+    	   4   │   name: my-topic
+    	   5   │   labels:
+    	   6   │     strimzi.io/cluster: my-cluster
+    	   7   │ spec:
+    	   8   │   partitions: 1
+    	   9   │   replicas: 1
+    	───────┴────────────────────────────────────────────
     ```
     
 2. KafkaTopic 생성 및 확인
