@@ -394,8 +394,9 @@ Cluster Operator를 사용하여 Strimzi HTTP Bridge를 배포하게 되면 사�
     [root@bridge-sidecar /]# curl -X GET http://localhost:8080/topics ; echo
     	["my-topic"]
     ```
-    
-3. consumer 그룹 생성
+    partition":0,"offset":0에 메시지가 저장되었다.
+
+3. 이제 메시지를 받아 보기 위해 consumer 그룹을 생성한다.
     
     ```java
     [root@bridge-sidecar /]# curl -X POST http://localhost:8080/consumers/my-group \
@@ -410,20 +411,28 @@ Cluster Operator를 사용하여 Strimzi HTTP Bridge를 배포하게 되면 사�
     >          }' ; echo
     	{"instance_id":"my-consumer","base_uri":"http://localhost:8080/consumers/my-group/instances/my-consumer"}
     ```
-    
-4. topic 정보 확인
+	여기까지는 정상 작동하였다. 근데 topic에 subscribe 하려고 했지만 에러가 발생하였다.
+
+### 🚨 Sidecar 사용하는 중에 에러 발생
+
+`kubectl logs`로 bridge container의 로그를 확인해 보았다.
+
+1. topic 정보 확인 ⇒ **권한 에러 발생**
     
     ```java
     [root@bridge-sidecar /]# curl -X GET http://localhost:8080/topics/my-topic ; echo
     	{"error_code":500,"message":"Topic authorization failed."}
     -----------------------------------------------------------------------------------
-    [2022-06-25 13:47:48,524] INFO  <getTopic    :85> [oop-thread-1] [1814703591] GET_TOPIC Request: from 127.0.0.1:40374, method = GET, path = /topics/my-topic
-    [2022-06-25 13:47:48,525] INFO  <ientEndpoint:96> [oop-thread-1] Describe topics [my-topic]
-    [2022-06-25 13:47:48,525] INFO  <ientEndpoint:104> [oop-thread-1] Describe configs [ConfigResource{name=my-topic,type=TOPIC,isDefault=false}]
-    [2022-06-25 13:47:48,526] INFO  <getTopic    :85> [oop-thread-1] [1814703591] GET_TOPIC Response:  statusCode = 200, message = OK
+    (🚴|DOIK-Lab:default) root@k8s-m:~# kubectl logs -n kafka bridge-sidecar -c bridge
+    	[2022-06-25 13:47:48,524] INFO  <getTopic    :85> [oop-thread-1] [1814703591] GET_TOPIC Request: from 127.0.0.1:40374, method = GET, path = /topics/my-topic
+    	[2022-06-25 13:47:48,525] INFO  <ientEndpoint:96> [oop-thread-1] Describe topics [my-topic]
+    	[2022-06-25 13:47:48,525] INFO  <ientEndpoint:104> [oop-thread-1] Describe configs [ConfigResource{name=my-topic,type=TOPIC,isDefault=false}]
+    	[2022-06-25 13:47:48,526] INFO  <getTopic    :85> [oop-thread-1] [1814703591] GET_TOPIC Response:  statusCode = 200, message = OK
     ```
     
-5. subscribe to my-topic
+    로그 상에는 응답코드는 200으로 출력되어 있다. 
+    
+2. subscribe to my-topic ⇒ **Connection refused**
     
     ```java
     [root@bridge-sidecar /]# curl -v -X POST http://localhost:8080/consumers/my-group/instances/my-consumer/subscription \
@@ -441,7 +450,7 @@ Cluster Operator를 사용하여 Strimzi HTTP Bridge를 배포하게 되면 사�
     	> POST /consumers/my-group/instances/my-consumer/subscription HTTP/1.1
     	> User-Agent: curl/7.29.0
     	> Host: localhost:8080
-    	> Accept: */*
+    	> Accept: */*                                                                                                                 */
     	> Content-Type: application/vnd.kafka.v2+json
     	> Content-Length: 72
     	>
@@ -449,12 +458,31 @@ Cluster Operator를 사용하여 Strimzi HTTP Bridge를 배포하게 되면 사�
     	< HTTP/1.1 204 No Content
     	<
     	* Connection #0 to host localhost left intact
+    
     -----------------------------------------------------------------------------------
-    [2022-06-25 13:44:57,188] INFO  <subscribe   :85> [oop-thread-1] [1000138638] SUBSCRIBE Request: from 127.0.0.1:39972, method = POST, path = /consumers/my-group/instances/my-consumer/subscription
-    [2022-06-25 13:44:57,189] INFO  <idgeEndpoint:199> [oop-thread-1] Subscribe to topics [SinkTopicSubscription(topic=my-topic,partition=null,offset=null), SinkTopicSubscription(topic=my-topic,partition=null,offset=null)]
-    [2022-06-25 13:44:57,189] INFO  <subscribe   :85> [oop-thread-1] [1000138638] SUBSCRIBE Response:  statusCode = 200, message = OK
-    [2022-06-25 13:44:57,190] INFO  <afkaConsumer:965> [mer-thread-0] [Consumer clientId=my-consumer, groupId=my-group] Subscribed to topic(s): my-topic
+    (🚴|DOIK-Lab:default) root@k8s-m:~# kubectl logs -n kafka bridge-sidecar -c bridge
+    	[2022-06-25 13:44:57,188] INFO  <subscribe   :85> [oop-thread-1] [1000138638] SUBSCRIBE Request: from 127.0.0.1:39972, method = POST, path = /consumers/my-group/instances/my-consumer/subscription
+    	[2022-06-25 13:44:57,189] INFO  <idgeEndpoint:199> [oop-thread-1] Subscribe to topics [SinkTopicSubscription(topic=my-topic,partition=null,offset=null), SinkTopicSubscription(topic=my-topic,partition=null,offset=null)]
+    	[2022-06-25 13:44:57,189] INFO  <subscribe   :85> [oop-thread-1] [1000138638] SUBSCRIBE Response:  statusCode = 200, message = OK
+    	[2022-06-25 13:44:57,190] INFO  <afkaConsumer:965> [mer-thread-0] [Consumer clientId=my-consumer, groupId=my-group] Subscribed to topic(s): my-topic
     ```
+    
+    Connection refused지만 응답코드는 200으로 출력되어 있다.  
+    `HTTP/1.1 204 No Content`는 요청은 정상이어도 요청 결과가 기존과 동일할 때 나오는 메시지이다. 
+
+
+  
+위 두 가지 케이스에서 공통으로 나오는 에러는 다음과 같다.
+```java
+WARN  <oducerConfig:380> [oop-thread-1] The configuration 'config.providers' was supplied but isn't a known config.
+WARN  <oducerConfig:380> [oop-thread-1] The configuration 'config.providers.env.class' was supplied but isn't a known config.
+```
+WARNING 수준이지만 이외 에러 로그는 보이지 않았다.
+
+  
+권한 에러는 몇 가지 가설을 세울 수 있는데 *(Secret/ConfigMap 설정, 방화벽/포트/ACL…)*  
+이 중에서 위 로그를 따라 ConfigMap에 설정되어 있는 `Configuration Providers`에 문제가 있는 걸로 접근했다.
+
 
 # 📚 참고 자료
 
