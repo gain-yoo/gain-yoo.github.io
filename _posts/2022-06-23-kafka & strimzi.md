@@ -11,7 +11,7 @@ sidebar:
     nav: "docs"
 ---
 
-# Kafka & Strimzi Operator
+# 🍭 Kafka & Strimzi Operator
 
 ## 1) Kafka란?
 
@@ -309,8 +309,9 @@ sidebar:
     
 
   
-# 참고 링크
+# 📚 참고 자료
 
+- 🚀**가시다님 노션**🚀
 - [카프카, 레빗엠큐, 레디스 큐의 큰 차이점! 이벤트 브로커와 메시지 브로커에 대해 알아봅시다.](https://www.youtube.com/watch?v=H_DaPyUOeTo)
 - [What is Streaming Data? How it Works, Examples, and Use Cases (KR)](https://www.confluent.io/ko-kr/learn/data-streaming/)
 - [이벤트 스트림 처리란 무엇입니까?](https://www.tibco.com/ko/reference-center/what-is-event-stream-processing)

@@ -591,8 +591,9 @@ prometheus adapter를 생성할 때, `kube-prometheus/example.jsonnet` 파일에
 jsonnet-bundler를 설치하고 `build.sh`를 실행하라고 했지만..아직 헤매는 중이다 ㅠ  
 *jsonnet-bundler 설치 링크 : [https://github.com/jsonnet-bundler/jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler)*
 
-# 4. 참고 링크
+# 4. 참고 자료
 
+- 🚀**가시다님 노션**🚀
 - [MySQL :: MySQL Operator for Kubernetes Manual :: 3.1 Deploy using Helm](https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-innodbcluster-simple-helm.html)  
 - [core_kubernetes/chapters/16 at master · bjpublic/core_kubernetes](https://github.com/bjpublic/core_kubernetes/tree/master/chapters/16)  
 - [Horizontal Pod Autoscaler 연습](https://kubernetes-docsy-staging.netlify.app/ko/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/#%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4-%EC%98%A4%EB%B8%8C%EC%A0%9D%ED%8A%B8%EC%99%80-%EA%B4%80%EB%A0%A8%EC%9D%B4-%EC%97%86%EB%8A%94-%EB%A9%94%ED%8A%B8%EB%A6%AD%EC%9D%84-%EA%B8%B0%EC%B4%88%EB%A1%9C%ED%95%9C-%EC%98%A4%ED%86%A0%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81)  
