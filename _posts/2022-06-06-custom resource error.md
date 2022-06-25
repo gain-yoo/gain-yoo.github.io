@@ -1,7 +1,7 @@
 ---
 layout: single
 title: "[Kubernetes] Custom Resource Definition Install Error"
-excerpt: "Kubernetes에 Custom Resource 생성하다가 CRD의 annotation이 너무 길어서 CRD가 생성되지 않는 에러 해결"
+excerpt: "Kubernetes에서 Prometheus Operator를 설치하다가 Custom Resource Conflict로 인해 CRD가 생성되지 않는 에러 해결"
 categories:
 - Trouble Shooting
 tag: [Kubernetes, 쿠버네티스, DevOps, AWS, CRD, CR, Custom Resource, 커스텀 리소스, 프로메테우스, Prometheus Operator]
