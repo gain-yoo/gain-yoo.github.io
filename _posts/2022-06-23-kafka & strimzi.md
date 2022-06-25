@@ -1,7 +1,7 @@
 ---
 layout: single
-title: "[Database/Kubernetes/DOIK] Kafka & Strimzi Operator - HTTP Bridge as a Sidecar (1)"
-excerpt: "Kafka & Strimzi Operator 설명 및 설치_작성중"
+title: "[Database/Kubernetes/DOIK] Kafka & Strimzi Operator (1) - 설치 "
+excerpt: "Kafka & Strimzi Operator 개념부터 설치까지"
 categories:
 - Database
 tag: [DOIK, Kubernetes, 쿠버네티스, DevOps, AWS, CRD, CR, Custom Resource, 커스텀 리소스, Helm, Kafka, Strimzi, HTTP Bridge, Sidecar]
@@ -11,7 +11,7 @@ sidebar:
     nav: "docs"
 ---
 
-# 1. Kafka & Strimzi Operator
+# Kafka & Strimzi Operator
 
 ## 1) Kafka란?
 
@@ -32,7 +32,6 @@ sidebar:
         2. 장애 발생 시 **장애 발생 시점부터** 다시 처리 가능
         3. 많은 양의 **실시간 스트림 데이터**를 효과적으로 처리 가능
 
-*참고 자료 영상 : [카프카, 레빗엠큐, 레디스 큐의 큰 차이점! 이벤트 브로커와 메시지 브로커에 대해 알아봅시다.](https://www.youtube.com/watch?v=H_DaPyUOeTo)*  
   
 ![스트림데이터기존데이터](https://user-images.githubusercontent.com/100563973/175553006-2bea4062-e9e2-4502-b7f3-81f20ba720ca.PNG)
 
@@ -45,23 +44,40 @@ sidebar:
     💡 keypoint : **저장(Storage) & 처리(Processing)**
 
 
-*참고 링크 : [What is Streaming Data? How it Works, Examples, and Use Cases (KR)](https://www.confluent.io/ko-kr/learn/data-streaming/)*  
-  
-
 ![이벤트스트림처리](https://user-images.githubusercontent.com/100563973/175553039-513d5edf-d3aa-4d6a-9b89-450c417b1624.PNG)
 
 - **이벤트** 처리 : **시간별로** 정렬된 **개별 이벤트**를 한 번에 하나씩 확인
 - **이벤트 스트림** 처리 : **대량** 이벤트를 **실시간으로** 함께 처리
 
-*참고 링크 : [이벤트 스트림 처리란 무엇입니까?](https://www.tibco.com/ko/reference-center/what-is-event-stream-processing)*
 
 ## 2) Strimzi Operator란?
 - Strimzi 는 Kubernetes 환경에서 Kafka 운영 관리에 도움을 주는 Operator 다.
 
 ![Untitled](https://user-images.githubusercontent.com/100563973/175555341-b9132848-024b-42fd-b554-e9d03d67b2e1.png)
+  
+- Stimzi Operator가 배포하는 구성 요소는 다음과 같다.
+    - **Apache ZooKeeper :** kafka의 metadata 저장. broker의 health check 담당. 컨트롤러 선택 가능
+    - **Kafka Connect** : kafka 클러스터와 다른 시스템 간의 스트리밍 데이터를 연결
+    - **Kafka MirrorMaker** : 두 개의 kafka 클러스터 간의 데이터 복제
+    - **Kafka Bridge** : HTTP 기반 클라이언트를 kafka 클러스터와 통합하기 위한 API 제공
+    - **Kafka Exporter** : 데이터 분석을 위해 prometheus 메트릭으로 추출
 
-[Strimzi Overview guide (In Development)](https://strimzi.io/docs/operators/in-development/overview.html)
+### 📣 kafka에서 자주 사용하는 용어 알기
 
+- **Producer** : kafka로 메시지를 보냄
+- **Consumer** : kafka에 있는 메시지를 읽음
+- **Broker** : kafka 애플리케이션이 설치된 서버 또는 노드. mysql 서버와 동일한 역할
+- **Topic** : 데이터가 들어가는 공간. 각 이름은 kafka 내에서 고유함
+- **Partition**
+    - 병렬 처리 및 고성능을 얻기 위해 하나의 topic을 여러 개로 나눔 *(데이터 분산 처리)*
+    - partition은 늘릴 수 있지만 줄일 수는 없음
+    - 해시 값을 지정하면 원하는 파티션으로 데이터를 전송할 수 있지만 그렇지 않으면 Round-Robin 방식으로 데이터가 전송됨  
+
+
+💡 **Tip ) kafka의** **<u>순서 보장</u>**
+- topic partition 1개만 사용
+- 레코드의 메시지 키 사용
+  
 ## 3) 브리지 사이드카로 애플리케이션을 배포하기 전에 준비
 
 ### (1) Strimzi Cluster Operator 설치
@@ -229,7 +245,6 @@ sidebar:
         - 즉, 위 매니페스트 파일에 의하면
         **`kafka` 또는 `zookeeper`는 *app.kubernetes.io/name=kafka* 또는 *app.kubernetes.io/name=zookeeper*인 조건 하나만 충족한다면 동일한 label의 pod끼리는 반드시 다른 node에 스케줄되어야 한다는 것을 의미한다.** ⇒ <u>고가용성</u>✨
 	  
-    *링크 참고 : [노드에 파드 할당하기](https://kubernetes.io/ko/docs/concepts/scheduling-eviction/assign-pod-node/#%ED%8C%8C%EB%93%9C%EA%B0%84-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0%EC%99%80-%EC%95%88%ED%8B%B0-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0)*    
     
 2. 클러스터 배포
     
@@ -288,3 +303,12 @@ sidebar:
     	configmap/strimzi-cluster-operator                  1      5h52m
     ```
     
+
+  
+# 참고 링크
+
+- [카프카, 레빗엠큐, 레디스 큐의 큰 차이점! 이벤트 브로커와 메시지 브로커에 대해 알아봅시다.](https://www.youtube.com/watch?v=H_DaPyUOeTo)
+- [What is Streaming Data? How it Works, Examples, and Use Cases (KR)](https://www.confluent.io/ko-kr/learn/data-streaming/)
+- [이벤트 스트림 처리란 무엇입니까?](https://www.tibco.com/ko/reference-center/what-is-event-stream-processing)
+- [Strimzi Overview guide (In Development)](https://strimzi.io/docs/operators/in-development/overview.html)
+- [노드에 파드 할당하기](https://kubernetes.io/ko/docs/concepts/scheduling-eviction/assign-pod-node/#%ED%8C%8C%EB%93%9C%EA%B0%84-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0%EC%99%80-%EC%95%88%ED%8B%B0-%EC%96%B4%ED%94%BC%EB%8B%88%ED%8B%B0)
