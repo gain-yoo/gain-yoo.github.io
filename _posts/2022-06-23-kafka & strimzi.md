@@ -63,6 +63,7 @@ sidebar:
     - **Kafka Exporter** : 데이터 분석을 위해 prometheus 메트릭으로 추출
 
 ### 📣 kafka에서 자주 사용하는 용어 알기
+![Untitled (1)](https://user-images.githubusercontent.com/100563973/175755097-d4c58ec0-c9bb-4d13-a662-3986de625cc4.png)
 
 - **Producer** : kafka로 메시지를 보냄
 - **Consumer** : kafka에 있는 메시지를 읽음
@@ -79,6 +80,9 @@ sidebar:
 - 레코드의 메시지 키 사용
   
 ## 3) 브리지 사이드카로 애플리케이션을 배포하기 전에 준비
+
+![kafka 실습구성도](https://user-images.githubusercontent.com/100563973/175755199-2a608615-7007-43d4-b367-7e685c1e984b.PNG)
+오늘 설치할 kafka의 실습 구성도다.
 
 ### (1) Strimzi Cluster Operator 설치
 
