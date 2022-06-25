@@ -15,7 +15,7 @@ sidebar:
 
 ## 1) Sidecar란?
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/aa23a724-c728-425b-96f5-f12c90ad7e9c/Untitled.png)
+![Untitled (2)](https://user-images.githubusercontent.com/100563973/175779063-d0bc9db7-6073-44be-8e2b-921c06ec3184.png)
 
 - 한 Pod 안에 두 개 이상의 Container가 존재한다.
 - 서비스를 micro 단위로 쪼개서 pod 하나에 애플리케이션 하나가 아닌, **container 하나에 애플리케이션 하나**인 구성이 가능하다.
@@ -25,7 +25,7 @@ sidebar:
 
 ## 2) Sidecar로 Strimzi HTTP Bridge
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/979b47b8-467e-4cc7-811b-80b9e4fcec93/Untitled.png)
+![Untitled (3)](https://user-images.githubusercontent.com/100563973/175779067-c66d83c4-7ba8-46c3-8ef8-4d745c2119e8.png)
 
 *그림 출처 : [Using HTTP Bridge as a Kubernetes sidecar](https://strimzi.io/blog/2021/08/18/using-http-bridge-as-a-kubernetes-sidecar/)*
 
