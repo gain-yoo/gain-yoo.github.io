@@ -491,6 +491,7 @@ WARNING 수준이지만 이외 에러 로그는 보이지 않았다.
 
 - 🚀**가시다님 노션**🚀
 - [Strimzi Kafka Bridge Documentation (0.21.5)](https://strimzi.io/docs/bridge/latest/)
+- [Strimzi Overview guide (In Development)](https://strimzi.io/docs/operators/in-development/overview.html#overview-components-kafka-bridge_str)
 - [Using HTTP Bridge as a Kubernetes sidecar](https://strimzi.io/blog/2021/08/18/using-http-bridge-as-a-kubernetes-sidecar/)
 - [Using Kubernetes Configuration Provider to load data from Secrets and Config Maps](https://strimzi.io/blog/2021/07/22/using-kubernetes-config-provider-to-load-data-from-secrets-and-config-maps/)
 - [https://github.com/strimzi/kafka-env-var-config-provider](https://github.com/strimzi/kafka-env-var-config-provider)
