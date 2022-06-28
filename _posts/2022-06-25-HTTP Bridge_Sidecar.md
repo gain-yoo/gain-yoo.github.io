@@ -484,7 +484,7 @@ WARNING 수준이지만 이외 에러 로그는 보이지 않았다.
 
   
 권한 에러는 몇 가지 가설을 세울 수 있는데 *(ConfigMap 설정, Secret 정보, 방화벽…)*  
-이 중에서 위 로그를 따라 ConfigMap에 설정되어 있는 `Configuration Providers`에 문제가 있는 걸로 접근했다.
+이 중에서 위 로그를 따라 ConfigMap에 설정되어 있는 `Configuration Providers`에 문제가 있는 걸로 접근했다!
 
 
 # 📚 참고 자료
