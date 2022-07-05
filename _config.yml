@@ -136,6 +136,7 @@ footer:
 include:
   - .htaccess
   - _pages
+  - _docs
 exclude:
   - "*.sublime-project"
   - "*.sublime-workspace"
@@ -207,6 +208,11 @@ paginate: 10 # amount of posts to show
 paginate_path: /page:num/
 timezone: #Asia/Seoul
 
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:path/
 
 # Plugins (previously gems:)
 plugins:
