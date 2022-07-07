@@ -277,9 +277,8 @@ defaults:
     values:
       layout: single
       author_profile: true
-      aside:
-        toc: true
-        toc_sticky: true
+      toc: true
+      toc_sticky: true
       read_time: false
       comments: true
       share: true
