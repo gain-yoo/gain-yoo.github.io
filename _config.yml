@@ -277,14 +277,17 @@ defaults:
     values:
       layout: single
       author_profile: true
-      # aside:
-      #   toc: true
+      aside:
+        toc: true
+        toc_sticky: true
       read_time: false
       comments: true
       share: true
       related: true
       show_date: true
       sitemap: true
+      sidebar:
+        nav: "main"
   # _pages 
   - scope:
       path: "_pages"
@@ -292,6 +295,8 @@ defaults:
     values:
       layout: single
       author_profile: true
+      sidebar:
+        nav: "main"
   # _docs
   - scope:
       path: ""
@@ -305,4 +310,8 @@ defaults:
       related: true
       show_date: true
       sitemap: true
+      toc: true
+      toc_sticky: true
+      sidebar:
+        nav: "main"
 date_format: "%Y-%m-%d"
