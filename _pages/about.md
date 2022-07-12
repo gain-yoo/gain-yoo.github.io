@@ -42,6 +42,7 @@ Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리�
  <u>2015.03 ~ 2020.02</u> 인덕대학교 컴퓨터전자공학과 전문학사  
 
 ## Certifications
+- **Certified Kubernetes Adminstrator** *(2022년 7월 8일)*
 - **Naver Cloud Platform Certified Professional** *(2022년 3월 24일)*
 - **MS Certified Azure Fundamental** *(2021년 8월 4일)*
 - **AWS Certified Solutions Architect – Professional** *(2021년 4월 4일)*
