@@ -27,6 +27,7 @@ repository               : gain-yoo/gain-yoo.github.io # GitHub username/repo-na
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : "/assets/images/snoopy2.jpg"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
+future                   : true
 breadcrumbs              : true # true, false (default)
 words_per_minute         : 200
 comments:
