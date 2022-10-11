@@ -1,6 +1,4 @@
 ---
-
-published: true
 layout: single
 title: "[Kubernetes/Git] 쿠버네티스 공식문서 한글화 기여"
 excerpt: "[ko]Translate untranslated sentence in ko/Deployments page #37120"
