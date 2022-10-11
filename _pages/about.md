@@ -42,6 +42,7 @@ Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리�
  <u>2015.03 ~ 2020.02</u> 인덕대학교 컴퓨터전자공학과 전문학사  
 
 ## Certifications
+- **Certified Kubernetes Adminstrator** *(2022년 7월 8일)*
 - **Naver Cloud Platform Certified Professional** *(2022년 3월 24일)*
 - **MS Certified Azure Fundamental** *(2021년 8월 4일)*
 - **AWS Certified Solutions Architect – Professional** *(2021년 4월 4일)*
@@ -49,5 +50,6 @@ Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리�
 - **ServiceNow Certified System Administration** *(2021년 1월 15일)*
 - **ITIL V4 Foundation** *(2021년 7월 20일)*
 - **정보처리산업기사** *(2020년 11월 5일)*  
-  
-<img src="https://user-images.githubusercontent.com/100563973/172617713-e34f7554-8610-499b-b205-a04897526b8d.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/100563973/172620907-abc10e37-7948-4d0b-ba2a-5e19a0ae1102.png" width="200" height="200"/>![NCP_Badge](https://user-images.githubusercontent.com/100563973/172617883-315a98e9-ab88-4bcc-a35a-318e519d3c18.png)![ITIL®-4-Foundation-CPD-200x200](https://user-images.githubusercontent.com/100563973/172617903-c3c578ae-903e-4d16-ad8e-e51729cde8e6.png)
+
+
+<img src="https://user-images.githubusercontent.com/100563973/178980222-a514f0fe-94f5-4897-b1ce-9591cead2b7b.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/100563973/172617713-e34f7554-8610-499b-b205-a04897526b8d.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/100563973/172620907-abc10e37-7948-4d0b-ba2a-5e19a0ae1102.png" width="200" height="200"/>![NCP_Badge](https://user-images.githubusercontent.com/100563973/172617883-315a98e9-ab88-4bcc-a35a-318e519d3c18.png)![ITIL®-4-Foundation-CPD-200x200](https://user-images.githubusercontent.com/100563973/172617903-c3c578ae-903e-4d16-ad8e-e51729cde8e6.png)
