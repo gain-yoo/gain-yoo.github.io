@@ -12,24 +12,24 @@ sidebar:
     nav: "docs"
 ---
 
-쿠버네티스 공식문서를 읽는 중에 한글 번역이 한 줄만 안되어 있는 걸 발견했다!
-
+쿠버네티스 공식문서를 읽는 중에 한글 번역이 한 줄만 안되어 있는 걸 발견했다!  
 마침 같은 팀원 중에 쿠버네티스 한글화팀으로 활동 중인 분이 있어서 이를 말씀드렸더니 직접 PR을 올려 보라고 권유해 주셨다.
+![image](https://user-images.githubusercontent.com/100563973/195141377-06293caf-3123-43c2-a2fc-a2814ae1984d.png)
 
-처음해 보는 Github에서 Pull Request 라니…..처음해 보는 쿠버네티스 한글화 기여라니…. 으악!
-
+처음해 보는 Github에서 Pull Request 라니…..처음해 보는 쿠버네티스 한글화 기여라니…. 으악!  
 사실 해보고 싶었다 ㅎㅎ (씨익)
 
-처음해 보는 것 투성이니까! 블로그에 기록용으로 남겨 본다! 작업하면서 [진이님 블로그 주소](https://jinnypark9393.github.io/posts/OSSCA)를 제일 많이 참고했다. (감사합니다 진이님 ㅎㅎ)
+처음해 보는 것 투성이니까! 블로그에 기록용으로 남겨 본다!  
+작업하면서 [진이님 블로그 주소](https://jinnypark9393.github.io/posts/OSSCA)를 제일 많이 참고했다. (감사합니다 진이님 ㅎㅎ)
 
-### 용어 참조
+## 내가 헷갈렸던 용어
 
 - `origin` : fork한 내 원격 저장소 *(= gain-yoo/website)*
-- `upstream` : 원본 원격저장소 *(= kubernetes/website**)***
+- `upstream` : 원본 원격저장소 *(= kubernetes/website)*
 
-### 내 로컬에서 사전 작업
+## 내 로컬에서 사전 작업
 
-먼저 쿠버네티스 공식 웹사이트 repository[[https://github.com/kubernetes/website](https://github.com/kubernetes/website)]를 내 repository에 **fork**하여 아래 단계로 진행하였다.
+먼저 [쿠버네티스 공식 웹사이트 repository](https://github.com/kubernetes/website)를 내 repository에 **fork**하여 아래 단계로 진행하였다.
 
 ```java
 rkdls@DESKTOP-94ANG27 MINGW32 ~/OneDrive/바탕 화면/github/kubernetes_website
@@ -78,8 +78,6 @@ $ git remote -v
 
 **kubernetes/website** 프로젝트를 upstream에 추가한다.
 
-**upstream**은 원본 저장소를 의미한다.
-
 그리고 **orgin** (내 로컬의 원격저장소)와 **upstream** (원본 원격저장소)를 확인한다.
 
 ```java
@@ -100,9 +98,9 @@ $ git rebase upstream/dev-1.25-ko.1
 	Successfully rebased and updated refs/heads/gain-yoo/deployment/v0.1.
 ```
 
-**fetch**로 upstream의 `dev-1.25-ko.1` 브랜치를 최신화하고(커밋 내역을 가져 오고) 내 작업 브랜치를 upstream 브랜치 끝 위치로 rebase해 준다.
+**fetch**로 upstream의 `dev-1.25-ko.1` 브랜치를 최신화하고(커밋 내역을 가져 오고) 내 작업 브랜치를 upstream 브랜치 끝 위치로 **rebase**해 준다.
 
-### PR(Pull Request)올리기
+## PR(Pull Request)올리기
 
 호다다닥 필요한 부분을 한글화하고 나서~
 
@@ -118,7 +116,7 @@ $ git commit -m "Translate /ko/docs/concepts/workloads/controllers/deployment/#�
 
 로컬저장소에 있는 파일을 내 원격 저장소(origin)에 업로드하기 위해 `git add .` 로 현재 폴더에 있는 파일을 Staged 상태로 만든다.
 
-그러고 커밋메세지를 만들어 Staging Area에 있는 변경사항을 commit 한다.
+그러고 커밋메세지를 적어 주고 Staging Area에 있는 변경사항을 commit 한다.
 
 ```java
 rkdls@DESKTOP-94ANG27 MINGW32 ~/OneDrive/바탕 화면/github/kubernetes_website/website (gain-yoo/deployment/v0.1)
@@ -154,21 +152,19 @@ $ git push --set-upstream origin gain-yoo/deployment/v0.1
 
 처음 PR은 직접 생성해 줘야 하지만 한번 연동해 두면 다음부터 진행하는 push는 Github에서 **자동으로 기존 생성한 PR에 변경사항을 업데이트** 해준다…!!!
 
-여러 개의 commit을 한 상황이라면 반드시 거쳐줘야 할 과정이 있다.
-
+여러 개의 commit을 한 상황이라면 반드시 거쳐줘야 할 과정이 있다.  
 쿠버네티스 공식문서 한글화팀에서는 PR을 한글화팀 작업 브랜치에 merge할 때 1개의 PR당 1개의 commit만 남도록 정리하고 있으니 아래를 참조하자!
 
-### PR 최종 반영 시 commit squashing하기 (amend 또는 rebase)
+## PR 최종 반영 시 commit squashing하기 (amend 또는 rebase)
 
-![Untitled](1%20%5Bko%5D%20Untranslated%20sentence%20in%20ko%20%E2%80%9DDeployments%E2%80%9D%20p%202e914f66a8aa47ef9aefc42e8e968cf5/Untitled.png)
+![Untitled](https://user-images.githubusercontent.com/100563973/195145050-61396745-6691-4ccf-91d4-d02b4edee558.png)
 
 처음엔 `rebase`로 commit squashing을 해 보려다가 커밋이 꼬이는 바람에 좀 더 쉬운 `amend`를 사용해 보았다.
 
 - `rebase`는 히스토리를 깔끔하게 유지하기 위해 사용하며, checkout한 브랜치의 커밋 내역을 지정하는 브랜치의 마지막 커밋 뒤에 재배치(rebase)하는 것을 말한다.
 
-[[GIT] git merge와 git rebase의 차이](https://hajoung56.tistory.com/5)
-
-[Git - Rebase 하기](https://git-scm.com/book/ko/v2/Git-%EB%B8%8C%EB%9E%9C%EC%B9%98-Rebase-%ED%95%98%EA%B8%B0)
+[참고 자료1](https://hajoung56.tistory.com/5)
+[참고 자료2](https://git-scm.com/book/ko/v2/Git-%EB%B8%8C%EB%9E%9C%EC%B9%98-Rebase-%ED%95%98%EA%B8%B0)
 
 ```java
 rkdls@DESKTOP-94ANG27 MINGW32 ~/OneDrive/바탕 화면/github/kubernetes_docs_ko/website (gain-yoo/deployment/v0.2)
@@ -239,6 +235,8 @@ $ git push -f origin gain-yoo/deployment/v0.2
 
 origin `gain-yoo/website`에 `gain-yoo/deployment/v0.2` 작업 브랜치에 강제로 `-f` 옵션으로 push해 주면 깔끔하고 간-단하게 commit squashing 할 수 있게 된다!
 
+## 내가 올린 PR
+
 [https://github.com/kubernetes/website/pull/37120](https://github.com/kubernetes/website/pull/37120)
 
-![Untitled](1%20%5Bko%5D%20Untranslated%20sentence%20in%20ko%20%E2%80%9DDeployments%E2%80%9D%20p%202e914f66a8aa47ef9aefc42e8e968cf5/Untitled%201.png)
+![Untitled 1](https://user-images.githubusercontent.com/100563973/195144985-a958cd14-205a-4a1f-93ec-5ad70c3434e9.png)
