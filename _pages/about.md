@@ -22,12 +22,10 @@ last_modified_at: 2022-05-27T19:50:03-05:00
 ## Profile
 Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리하여 포스팅하고 있습니다.  
   
-주로 kubernetes를 공부하고 있고, 최근 Database 스터디를 시작했습니다.
-
 
 ## TimeLine
- <u>2021.10 ~</u> MYDATA - **DevOps Engineer**
- - <u>2021.10 ~</u> S사 전사 시스템 클라우드 전환 프로젝트
+ <u>2021.10 ~ 2023.12</u> MYDATA - **DevOps Engineer**
+ - <u>2021.10 ~ 2023.12</u> 삼성전자 클라우드 전환 프로젝트
       - 클라우드 및 온프레미스 환경의 시스템을 컨테이너 환경으로 전환
 
  <u>2021.01 ~ 2021.10</u> Rainlightsoft - **Technical Consultant**
@@ -42,6 +40,8 @@ Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리�
  <u>2015.03 ~ 2020.02</u> 인덕대학교 컴퓨터전자공학과 전문학사  
 
 ## Certifications
+- **Certified Kubernetes Application Developer** *(2023년 12월 21일)*
+- **FinOps Certified Practitioner** *(2023년 11월 27일)*
 - **Certified Kubernetes Adminstrator** *(2022년 7월 8일)*
 - **Naver Cloud Platform Certified Professional** *(2022년 3월 24일)*
 - **MS Certified Azure Fundamental** *(2021년 8월 4일)*
@@ -52,4 +52,4 @@ Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리�
 - **정보처리산업기사** *(2020년 11월 5일)*  
 
 
-<img src="https://user-images.githubusercontent.com/100563973/178980222-a514f0fe-94f5-4897-b1ce-9591cead2b7b.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/100563973/172617713-e34f7554-8610-499b-b205-a04897526b8d.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/100563973/172620907-abc10e37-7948-4d0b-ba2a-5e19a0ae1102.png" width="200" height="200"/>![NCP_Badge](https://user-images.githubusercontent.com/100563973/172617883-315a98e9-ab88-4bcc-a35a-318e519d3c18.png)![ITIL®-4-Foundation-CPD-200x200](https://user-images.githubusercontent.com/100563973/172617903-c3c578ae-903e-4d16-ad8e-e51729cde8e6.png)
+![ckad-certified-kubernetes-application-developer (1)](https://github.com/gain-yoo/gain-yoo.github.io/assets/100563973/5b302001-04e0-4bcc-a126-ec231116cec2)![finops-certified-practitioner 3 (1)](https://github.com/gain-yoo/gain-yoo.github.io/assets/100563973/ae42539d-11f6-47f0-8c34-5e3e4793ebb0)<img src="https://user-images.githubusercontent.com/100563973/178980222-a514f0fe-94f5-4897-b1ce-9591cead2b7b.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/100563973/172617713-e34f7554-8610-499b-b205-a04897526b8d.png" width="200" height="200"/><img src="https://user-images.githubusercontent.com/100563973/172620907-abc10e37-7948-4d0b-ba2a-5e19a0ae1102.png" width="200" height="200"/>![NCP_Badge](https://user-images.githubusercontent.com/100563973/172617883-315a98e9-ab88-4bcc-a35a-318e519d3c18.png)![ITIL®-4-Foundation-CPD-200x200](https://user-images.githubusercontent.com/100563973/172617903-c3c578ae-903e-4d16-ad8e-e51729cde8e6.png)
