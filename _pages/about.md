@@ -17,7 +17,7 @@ last_modified_at: 2022-05-27T19:50:03-05:00
 ---
 
 ----
-💥 블루블로그😂  
+게인스 블로그🤗 
 
 ## Profile
 Study나 Trouble Shooting 내용을 Notion에 기록하고 블로그에 정리하여 포스팅하고 있습니다.  

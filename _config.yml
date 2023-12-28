@@ -12,20 +12,20 @@
 
 # theme                  : "minimal-mistakes-jekyll"
 # remote_theme           : "mmistakes/minimal-mistakes"
-minimal_mistakes_skin    : "air" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+minimal_mistakes_skin    : "contrast" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
 locale                   : "en-US"
-title                    : "개인블루그"
+title                    : "Gain's Blog"
 title_separator          : "|"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "GAINS"
-description              : "개인개발자의 개발개인블루그"
+description              : "Gain's Blog"
 url                      : "https://gain-yoo.github.io/"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : gain-yoo/gain-yoo.github.io # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
-logo                     : "/assets/images/snoopy2.jpg"
+logo                     : # "/assets/images/snoopy2.jpg"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 future                   : true
 breadcrumbs              : true # true, false (default)
@@ -103,21 +103,24 @@ analytics:
 
 # Site Author
 author:
-  name             : "개인개발"
-  avatar           : "/assets/images/jinro.png" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "바지런하게 스프린트!😂"
+  name             : "I'm an Engineer"
+  avatar           : "/assets/images/mool.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  bio              : " "
   location         : "South Korea"
   #email            : "rkdlsdb@naver.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      url: "mailto:rkdlsdb@naver.com"
+      url: "mailto:rkdlsdb@gmail.com"
     # - label: "Website"
     #   icon: "fas fa-fw fa-link"
     #   url: "https://gain-yoo.github.io"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/gain-yoo"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/%EA%B0%80%EC%9D%B8-%EC%9C%A0-b26816245/"
     # - label: "Instagram"
     #   icon: "fab fa-fw fa-instagram"
     #   url: "https://www.instagram.com/gany_yy/"
@@ -128,9 +131,12 @@ footer:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/gain-yoo"
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      url: "https://www.instagram.com/gany_yy/"
+    # - label: "Instagram"
+    #   icon: "fab fa-fw fa-instagram"
+    #   url: "https://www.instagram.com/gany_yy/"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/%EA%B0%80%EC%9D%B8-%EC%9C%A0-b26816245/"
 
 
 # Reading Files
