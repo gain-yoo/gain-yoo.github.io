@@ -33,6 +33,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install Ruby
+        run: |
+          git clone https://github.com/rbenv/ruby-build.git
+          sudo ./ruby-build/install.sh
+          sudo ruby-build 3.1.4 $RUNNER_TOOL_CACHE/Ruby/3.1.4/x64
+          sudo touch $RUNNER_TOOL_CACHE/Ruby/3.1.4/x64.complete
+          echo "$RUNNER_TOOL_CACHE/Ruby/3.1.4/x64/bin" >> $GITHUB_PATH
+      
+      - name: Use Ruby
+        run: |
+          ruby --version
+          gem install bundler
+          bundle install
       - name: Setup Ruby
         uses: ruby/setup-ruby@8575951200e472d5f2d95c625da0c7bec8217c42 # v1.161.0
         with:
